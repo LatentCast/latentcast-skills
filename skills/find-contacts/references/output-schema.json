@@ -1,0 +1,203 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/LatentCast/latentcast-skills/skills/find-contacts/references/output-schema.json",
+  "title": "find-contacts record",
+  "description": "One record per company, always emitted, so a company that returned nothing is distinguishable from one that was never run.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "company",
+    "status",
+    "people",
+    "researched_at"
+  ],
+  "properties": {
+    "company": {
+      "type": "string",
+      "description": "Company name as written."
+    },
+    "domain": {
+      "type": "string",
+      "description": "Registrable domain, no scheme. Used for deduplication."
+    },
+    "country": {
+      "type": "string"
+    },
+    "industry": {
+      "type": "string"
+    },
+    "audience": {
+      "type": "string",
+      "description": "Free text, matched downstream against offer.variants[].audience in the seller profile. Absent means the default offer applies."
+    },
+    "status": {
+      "enum": [
+        "ok",
+        "partial",
+        "failed"
+      ],
+      "description": "ok = target met. partial = fewer people or signals than asked for. failed = nothing usable. A failed record is still a record."
+    },
+    "notes": {
+      "type": "string",
+      "description": "Why a record is partial or failed, in one line."
+    },
+    "researched_at": {
+      "type": "string",
+      "description": "Date the research ran, YYYY-MM-DD. Taken from the environment at run start, never hardcoded."
+    },
+    "recency_window_months": {
+      "type": "integer",
+      "description": "What 'recent' meant for this run, so a later reader can judge staleness."
+    },
+    "people": {
+      "type": "array",
+      "description": "Verified decision-makers. May be empty; an empty array with status partial or failed is an honest answer.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "full_name",
+          "title",
+          "profile_url",
+          "profile_source",
+          "confidence",
+          "persona_match",
+          "why_right_contact"
+        ],
+        "properties": {
+          "recipient_id": {
+            "type": "string",
+            "description": "Stable id, minted here as R-0001 upward. The resume key for every downstream step."
+          },
+          "full_name": {
+            "type": "string"
+          },
+          "first_name": {
+            "type": "string"
+          },
+          "last_name": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "profile_url": {
+            "type": "string",
+            "description": "A checkable public page showing this person in this role. A professional network profile, a company leadership page, a dated press release or a conference speaker page all qualify. Omit the person entirely if you cannot find one."
+          },
+          "profile_source": {
+            "type": "string",
+            "description": "What kind of page profile_url is, e.g. 'company leadership page'."
+          },
+          "confidence": {
+            "enum": [
+              "high",
+              "medium",
+              "low"
+            ]
+          },
+          "persona_match": {
+            "enum": [
+              "strong",
+              "adjacent",
+              "fallback"
+            ],
+            "description": "Honest self-report against the declared buyer. Sorting a finished run by fallback is how you discover your buyer definition was too vague."
+          },
+          "why_right_contact": {
+            "type": "string",
+            "description": "Which declared title rule or persona clause this person satisfies. 'Senior leader at the company' is a failure, not a justification."
+          },
+          "role_status": {
+            "enum": [
+              "confirmed",
+              "conflicting",
+              "unconfirmed"
+            ],
+            "description": "conflicting means two sources disagree. Flag it rather than silently picking one."
+          },
+          "role_source_url": {
+            "type": "string",
+            "description": "The dated primary source, where one exists."
+          }
+        }
+      }
+    },
+    "signals": {
+      "type": "array",
+      "description": "Dated, sourced events. Ranked by the seller profile's signal_priority.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "fact",
+          "date",
+          "date_confidence",
+          "source_url"
+        ],
+        "properties": {
+          "fact": {
+            "type": "string",
+            "description": "What happened, one sentence, as the source states it."
+          },
+          "date": {
+            "type": "string",
+            "pattern": "^[0-9]{4}(-[0-9]{2})?(-[0-9]{2})?$",
+            "description": "YYYY-MM at minimum. Undated pages are the single most common trap; establish the actual year before using a signal."
+          },
+          "date_confidence": {
+            "enum": [
+              "exact",
+              "month",
+              "approximate"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "description": "Free text, drawn from the seller profile's signal_priority ladder."
+          },
+          "source_url": {
+            "type": "string",
+            "description": "The page that states it. Not a search result page."
+          },
+          "angle": {
+            "type": "string",
+            "description": "One line: how this seller's offer connects to this event, in the seller's own terms. Never a booking link and never a call to action."
+          }
+        }
+      }
+    },
+    "evidence_url": {
+      "type": "string",
+      "description": "Sourcing step only. A page that names this company. Required there; a candidate without one is dropped."
+    },
+    "fit_score": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 5,
+      "description": "Sourcing step only. Judged from the company's own words, not a directory blurb."
+    },
+    "fit_reason": {
+      "type": "string",
+      "description": "Sourcing step only. One line, in their own words."
+    },
+    "liveness": {
+      "enum": [
+        "verified-200",
+        "verified-403-waf",
+        "dns-only-needs-check",
+        "domain-unresolved"
+      ],
+      "description": "Sourcing step. What happened when the domain was checked. A label, not a gate: a company is not dropped for a site that would not load."
+    },
+    "site_count": {
+      "type": "integer",
+      "description": "Sourcing step. How many register entries this one organisation covers. Registers list premises; you are selling to the organisation."
+    },
+    "registers": {
+      "type": "string",
+      "description": "Sourcing step. Which register or registers listed this organisation. Two independent registers is a stronger signal than one."
+    }
+  }
+}

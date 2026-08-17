@@ -1,0 +1,163 @@
+# Your outreach profile — the one file both skills read.
+#
+# You should not have to write this by hand. The skills ask you a couple of questions and
+# offer to save the answers here, so the next run does not ask again. This example is a
+# reference for the shape, and a place to check what else you can set.
+#
+# Everything here is invented for documentation. Haldenbrook Routing does not exist and
+# every domain uses the IANA-reserved .example namespace, which can never belong to a real
+# company. Replace all of it with your own.
+#
+# Running validate_config.py against this file UNCHANGED will fail, on purpose. It detects
+# values carried over from the example, which is exactly what you want it to catch.
+#
+# Save your real one as ./outreach-profile.yaml in your project. The skills look for it at:
+#   ./outreach-profile.yaml
+#   ./.latentcast/outreach-profile.yaml
+#   ~/.latentcast/outreach-profile.yaml
+#
+# Do not keep it inside the installed skill directory. `npx skills update` overwrites that
+# directory, and you would lose the file without being told.
+
+schema_version: 1
+
+# ---------------------------------------------------------------------------
+# seller — who you are. Read by both skills.
+# ---------------------------------------------------------------------------
+seller:
+  company: "Haldenbrook Routing"
+  website: "https://haldenbrook.example.com"
+
+  # product_noun goes VERBATIM into the spoken welcome sentence, so write it the way you
+  # would say it out loud. "route optimisation", not "our RouteIQ 3.0 platform".
+  product_noun: "route optimisation"
+
+  what_it_does: "plans multi-depot delivery routes and replans them during the day"
+  who_you_sell_to: "mid-market food distributors and 3PLs across northern Europe"
+
+  # Optional. Used to ground an outcome in something true. Never invented by the skill.
+  proof_points:
+    - "cuts weekly route planning from four hours to twenty minutes"
+
+# ---------------------------------------------------------------------------
+# voice — how you sound. Read by both skills.
+# These are defaults, not law. Edit them; they are yours, not ours.
+# ---------------------------------------------------------------------------
+voice:
+  banned:
+    - "em dashes"
+    - "exclamation marks"
+    - '"Saw that you..." openers'
+    - "generic outcomes like \"book more meetings\" or \"grow your pipeline\""
+  required:
+    - "congratulate the event, never restate their strategy back to them"
+    - "never criticise how they do it today"
+    - "cut every word that is not load-bearing"
+    - "tell them nothing about their own business that they already know"
+  currency: "EUR"
+  spelling: "en-GB"
+  greeting: "comma after the first name"
+
+# ---------------------------------------------------------------------------
+# buyer — who to look for. Read by find-contacts only.
+# At least one of `titles` or `persona` is required.
+# ---------------------------------------------------------------------------
+buyer:
+  titles:
+    - "VP Operations"
+    - "Director of Fulfilment"
+    - "Head of Supply Chain"
+    - "Head of Distribution"
+
+  persona: >-
+    The person accountable for getting goods out of the door on time and for what a
+    delivery costs. Owns the fleet or the planners, sits over daily operations rather
+    than over IT strategy.
+
+  exclude_titles: ["Recruiter", "Account Executive", "Software Engineer"]
+
+  # Optional. Overrides `titles` when the condition matches. This is how a segment rule
+  # is expressed; there are no built-in ones.
+  segment_rules:
+    - when: "third-party logistics provider"
+      titles: ["Managing Director", "Founder", "Chief Operating Officer"]
+    - when: "headcount above 1000"
+      titles: ["VP Supply Chain", "Director of Logistics"]
+
+  per_company: 2
+
+# ---------------------------------------------------------------------------
+# research — what counts as a signal. Read by find-contacts only.
+# ---------------------------------------------------------------------------
+research:
+  recency_months: 6
+
+  # Reorder this. Correct ranking is offer-dependent: a compliance vendor wants a
+  # regulatory finding above a funding round, and this ladder would serve them badly.
+  signal_priority:
+    - "expansion"        # new site, new market, new depot
+    - "funding"
+    - "milestone"
+    - "contract win"
+    - "product launch"
+    - "partnership"
+
+  signal_types_to_ignore: ["hiring", "award shortlists"]
+
+# ---------------------------------------------------------------------------
+# offer — what you ask for. Read by build-personalization-canvas only.
+# ---------------------------------------------------------------------------
+offer:
+  meeting_length: "20 minutes"
+  booking_url: "https://cal.example.com/haldenbrook/20min"
+
+  # The default outcome, used when no variant matches. Specific beats broad.
+  default: "hold cost-per-drop flat as the network grows"
+
+  # Variants replace a hardcoded segment branch. `audience` is matched against the
+  # contact's own `audience` field. A reseller's offer is "add this to what you already
+  # run for your clients", never "use this yourself".
+  variants:
+    - audience: "3pl"
+      offer: "add {product_noun} to the networks you run for your clients, so a new account does not mean a new planner"
+
+# ---------------------------------------------------------------------------
+# canvas — the campaign's video settings. Read by build-personalization-canvas only.
+# ---------------------------------------------------------------------------
+canvas:
+  # WHO IS ON CAMERA — canvas columns X, Y and Z.
+  # Leave these blank and every video renders with no sender.
+  rep:
+    email: "sam@haldenbrook.example"
+    first_name: "Sam"
+    last_name: "Rivera"
+    # Frames whose voice the copy is written in. A Head of Sales and a founder do not
+    # sound the same, and the recipient can tell.
+    title: "Head of Sales"
+
+  # Cell values, one per recipient. Do NOT put a toggle state such as
+  # "Deduct from Context" in here: that is a row-3 switch, not a cell value.
+  look_and_feel:
+    vo_language: "English (UK)"      # T. Written as Language (REGION).
+    subtitles: ""                    # U. A locale code such as en-GB, only when U is LANGUAGE.
+    attire_color: ""                 # N. A colour such as Navy. Blank here because N is set
+                                     #    to "Deduct from Context" below.
+    clothing_style: "Business smart (blazer, no tie)"        # O
+    relationship_context: "Cold prospect, no prior contact"  # K. Free text, not a code.
+
+  # Row-3 switches: is this dimension used at all in this campaign?
+  # ON / OFF everywhere, plus "Deduct from Context" on N, O, V and W where LatentCast picks
+  # the value, plus "LANGUAGE" on U where subtitles follow the locale in the data cell.
+  # The template ships everything ON, so this is a list of deliberate exceptions.
+  toggles:
+    P: "OFF"                    # no first-party imagery sourced for this campaign
+    Q: "OFF"
+    R: "OFF"
+    S: "OFF"
+    U: "OFF"                    # no subtitles
+    N: "Deduct from Context"    # let LatentCast pick attire colour from brand context
+
+  review:
+    # The platform will translate confidently into a language you cannot check. Any row
+    # whose vo_language differs from the default above needs a named fluent reviewer.
+    non_default_vo_requires_named_reviewer: true

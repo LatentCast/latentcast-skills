@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Security report
+    url: https://github.com/LatentCast/latentcast-skills/security/advisories/new
+    about: Report a vulnerability privately rather than in a public issue.
+  - name: LatentCast platform
+    url: https://latentcast.com
+    about: Questions about rendering video from a canvas, rather than about these skills.

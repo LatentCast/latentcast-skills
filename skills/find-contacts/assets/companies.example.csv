@@ -1,0 +1,8 @@
+# Five very large listed companies, here so a first run returns something. They are not a
+# prospect list and are not a starting point. Replace them with your own. See README.md.
+company,domain,country,industry,audience,target
+Unilever,unilever.com,United Kingdom,Consumer goods,enterprise,2
+Maersk,maersk.com,Denmark,Shipping and logistics,enterprise,2
+Siemens,siemens.com,Germany,Industrial technology,enterprise,2
+Shopify,shopify.com,Canada,Commerce software,enterprise,2
+Woolworths Group,woolworthsgroup.com.au,Australia,Grocery retail,enterprise,2

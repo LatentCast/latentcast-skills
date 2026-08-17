@@ -1,0 +1,16 @@
+name: Skill or feature request
+description: Suggest a new skill, or a change to an existing one
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do
+      description: The task, not the solution. What does the work look like today?
+    validations: { required: true }
+  - type: textarea
+    id: fit
+    attributes:
+      label: Would this work for sellers other than you
+      description: "These skills carry no assumptions about who is selling what. If your idea needs one, say what it is."
+    validations: { required: true }

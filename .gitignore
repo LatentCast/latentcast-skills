@@ -1,0 +1,28 @@
+# Your own config. Never commit a real seller profile: it carries your booking link,
+# your positioning, and possibly a rep's email address.
+# Anchored to the root so it cannot swallow examples/seller-profile.yaml or the
+# seller-profile.example.yaml each skill ships.
+/seller-profile.yaml
+/.latentcast/
+
+# Run output
+out/
+records/
+rows.json
+contacts.csv
+*.xlsx
+!examples/*.xlsx
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+
+# OS
+.DS_Store
+
+# Created by `uv run`; this repo is not a uv project.
+uv.lock

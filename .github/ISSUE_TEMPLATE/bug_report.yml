@@ -1,0 +1,32 @@
+name: Bug report
+description: Something in a skill does not work as documented
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please do not paste real prospect data, contact lists or profile URLs into an issue.
+        Redact them or use `.example` placeholders.
+  - type: dropdown
+    id: skill
+    attributes:
+      label: Which skill
+      options: [find-contacts, build-personalization-canvas, the repo itself]
+    validations: { required: true }
+  - type: input
+    id: agent
+    attributes:
+      label: Which agent and version
+      placeholder: "Claude Code 2.1, Codex CLI, Cursor..."
+    validations: { required: true }
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what you expected instead
+    validations: { required: true }
+  - type: textarea
+    id: output
+    attributes:
+      label: The success or error line
+      description: "If it involves the canvas builder, paste the line it printed. It carries both version numbers."
+      render: shell

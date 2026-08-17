@@ -1,0 +1,48 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: pip install "openpyxl>=3.1,<4" pytest pyyaml ruff
+
+      - name: Lint
+        run: ruff check .
+
+      # Includes the leakage gate and the v6 column-letter regression test.
+      - name: Tests
+        run: pytest tests/ -q
+
+      # The quick start in the README must actually work, with no warnings.
+      - name: Build the example end to end
+        run: |
+          python skills/build-personalization-canvas/scripts/build_canvas.py \
+            examples/rows.example.json /tmp/canvas.xlsx \
+            --toggles "P=OFF,Q=OFF,R=OFF,S=OFF,U=OFF,N=Deduct from Context" --strict
+          test -f /tmp/canvas.xlsx
+
+      - name: Validate the example outreach profile is still detected as unedited
+        run: |
+          if python3 skills/find-contacts/scripts/validate_config.py \
+               examples/outreach-profile.yaml; then
+            echo "validate_config should reject the unedited example profile"; exit 1
+          fi
+
+      - name: Regenerate the sample CSV and confirm it is committed up to date
+        run: |
+          python3 skills/find-contacts/scripts/rows_to_csv.py \
+            skills/find-contacts/assets/record.example.json \
+            /tmp/output.csv --today 2026-08-17
+          diff /tmp/output.csv skills/find-contacts/assets/output.example.csv

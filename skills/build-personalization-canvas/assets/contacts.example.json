@@ -1,0 +1,113 @@
+[
+  {
+    "recipient_id": "R-0001",
+    "full_name": "Priya Raman",
+    "first_name": "Priya",
+    "last_name": "Raman",
+    "title": "VP Supply Chain",
+    "company": "Ostvale Provisions",
+    "company_spoken": "Ostvale",
+    "domain": "ostvale.example.com",
+    "country": "Netherlands",
+    "industry": "Food distribution",
+    "audience": "distributor",
+    "profile_url": "https://ostvale.example.com/about/leadership",
+    "profile_source": "company leadership page",
+    "confidence": "high",
+    "persona_match": "strong",
+    "why_right_contact": "Owns the fleet and the planning team; the leadership page names her as accountable for distribution, not IT.",
+    "signals": [
+      {
+        "fact": "Opened a second distribution centre in Rotterdam, roughly doubling northern-Europe throughput",
+        "date": "2026-03",
+        "date_confidence": "month",
+        "type": "expansion",
+        "source_url": "https://ostvale.example.com/news/rotterdam-dc"
+      },
+      {
+        "fact": "Stated intent to serve Germany and Denmark from the new site",
+        "date": "2026-03",
+        "date_confidence": "month",
+        "type": "expansion",
+        "source_url": "https://ostvale.example.com/news/rotterdam-dc"
+      },
+      {
+        "fact": "Runs its own fleet with routes planned in-house; no dynamic routing in the published stack",
+        "date": "2026-01",
+        "date_confidence": "approximate",
+        "type": "milestone",
+        "source_url": "https://ostvale.example.com/how-we-deliver"
+      }
+    ],
+    "status": "ok",
+    "notes": "",
+    "researched_at": "2026-08-17"
+  },
+  {
+    "recipient_id": "R-0002",
+    "full_name": "Tomas Lindqvist",
+    "first_name": "Tomas",
+    "last_name": "Lindqvist",
+    "title": "Head of Distribution",
+    "company": "Quernvale Bakery Group",
+    "company_spoken": "Quernvale",
+    "domain": "quernvale.example.com",
+    "country": "Sweden",
+    "industry": "Bakery and chilled foods",
+    "audience": "distributor",
+    "profile_url": "https://quernvale.example.com/en/team",
+    "profile_source": "company team page",
+    "confidence": "medium",
+    "persona_match": "strong",
+    "why_right_contact": "Named on the team page as running distribution. No sales or IT remit listed.",
+    "signals": [
+      {
+        "fact": "Added a chilled range to the daily delivery run",
+        "date": "2026-05",
+        "date_confidence": "approximate",
+        "type": "product launch",
+        "source_url": "https://quernvale.example.com/en/ranges/chilled"
+      }
+    ],
+    "status": "partial",
+    "notes": "Only one signal found, and it is weak. No dated announcement, funding or expansion in the recency window. Kept because the fit is good; the copy should lead with the offer rather than congratulate a non-event.",
+    "researched_at": "2026-08-17"
+  },
+  {
+    "recipient_id": "R-0003",
+    "full_name": "Aisha Bello",
+    "first_name": "Aisha",
+    "last_name": "Bello",
+    "title": "Managing Director",
+    "company": "Fellgate Logistics",
+    "company_spoken": "Fellgate",
+    "domain": "fellgate.example.com",
+    "country": "Ireland",
+    "industry": "Third-party logistics",
+    "audience": "3pl",
+    "profile_url": "https://fellgate.example.com/about",
+    "profile_source": "company about page",
+    "confidence": "high",
+    "persona_match": "strong",
+    "why_right_contact": "Third-party logistics provider, so the segment rule applies and the buyer is the principal rather than a functional VP.",
+    "signals": [
+      {
+        "fact": "Won a three-year contract to run ambient distribution for a grocery group",
+        "date": "2026-06",
+        "date_confidence": "month",
+        "type": "contract win",
+        "source_url": "https://fellgate.example.com/news/ambient-contract"
+      },
+      {
+        "fact": "Operates four regional depots for a mix of retail and foodservice clients",
+        "date": "2026-02",
+        "date_confidence": "approximate",
+        "type": "milestone",
+        "source_url": "https://fellgate.example.com/network"
+      }
+    ],
+    "status": "ok",
+    "notes": "",
+    "researched_at": "2026-08-17"
+  }
+]
