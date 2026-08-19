@@ -8,17 +8,22 @@ You declare who you are and what you sell. Nothing here assumes you sell what we
 
 | Skill | You have | You get |
 |-------|----------|---------|
-| [`find-contacts`](skills/find-contacts/) | A segment, or a list of companies | Companies sourced from real registers, then the right people at each, backed by a page you can open, plus dated signals |
-| [`build-personalization-canvas`](skills/build-personalization-canvas/) | Contacts and signals | A Personalization Canvas `.xlsx`, ready to render video from |
+| [`find-contacts`](skills/find-contacts/) | A segment, or a list of companies | Companies sourced from real registers, scored on fit and campaign relevance, routed, then the right people at each backed by a page you can open |
+| [`enrich-contacts`](skills/enrich-contacts/) | Contacts | Dated, sourced signals, each with an opening angle. Optionally the personalization copy for your email sequence |
+| [`build-personalization-canvas`](skills/build-personalization-canvas/) | All of it | A Personalization Canvas `.xlsx`, ready to render video from |
+
+Three stages, and **the review happens between them**. Sourcing is cheap and finding people is
+not; finding people is cheap and writing copy is not. Each boundary is where you cut the list.
 
 ## Which one do I need
 
 Start from what you already have, not from what you want.
 
 ```
-Just a segment in mind?    -> find-contacts, both steps
-A list of companies?       -> find-contacts, step 2
-A list of people already?  -> build-personalization-canvas
+Just a segment in mind?    -> all three, in order
+A list of companies?       -> find-contacts step 2, then enrich, then canvas
+A list of people already?  -> enrich-contacts, then canvas
+People and signals?        -> build-personalization-canvas
 A canvas already?          -> you are done here. Render it in the platform.
 ```
 
@@ -31,7 +36,12 @@ companies in a segment returns listicles and inventions. `find-contacts` instead
 maintains the list, accreditation registers, association members, exhibitor lists, and enumerates
 those, so every company arrives with a page you can open.
 
-**Neither skill produces email addresses.** People are verified against public profile pages and
+**The score is a decision, not a filter.** Companies are rated on two dimensions: `company_fit`,
+which is durable, and `campaign_relevance`, which is per-campaign. A company can be a 5 on fit and
+a 2 for a campaign about expansion. The combined score routes it to white-glove or cold against
+thresholds you set, and it travels with every downstream row rather than being used to discard.
+
+**No skill produces email addresses.** People are verified against public profile pages and
 it stops there, deliberately, because guessed addresses bounce and bounces damage the sending
 reputation you need for everything else. The canvas requires an email in column C, so fill it
 from your CRM or a verified-email provider.
@@ -39,16 +49,16 @@ from your CRM or a verified-email provider.
 ## What is an agent skill
 
 A folder holding a `SKILL.md` and its supporting files. Your coding agent reads the description,
-decides the skill is relevant, and follows it. Both skills here are written as plain instructions
-so they work in Claude Code, Codex, Cursor and anything else that supports the format. Each also
-ships an optional Claude Code workflow that runs the same steps concurrently.
+decides the skill is relevant, and follows it. All three here are written as plain instructions
+so they work in Claude Code, Codex, Cursor and anything else that supports the format. Two also
+ship an optional Claude Code workflow that runs the same steps concurrently.
 
 See [vercel-labs/skills](https://github.com/vercel-labs/skills) for the CLI and the wider
 ecosystem.
 
 ## Install
 
-Both skills:
+All three:
 
 ```bash
 npx skills add LatentCast/latentcast-skills
@@ -66,9 +76,10 @@ Or copy the folder from `skills/` into your agent's skills directory by hand.
 
 | For | You need |
 |-----|----------|
-| `build-personalization-canvas` | Python 3.10+ and `openpyxl>=3.1,<4`. No API key, no account. |
 | `find-contacts` | An agent that can search the web and fetch pages. A research-grade search index improves yield a lot but is not required. |
-| Both, optionally | `python3` for the helper scripts. Standard library only, nothing to install. |
+| `enrich-contacts` | The same. Plus a `sequence` block in your profile if you want the copy. |
+| `build-personalization-canvas` | Python 3.10+ and `openpyxl>=3.1,<4`. No API key, no account. |
+| Any of them, optionally | `python3` for the helper scripts. Standard library only, nothing to install. |
 
 ## Quick start
 
@@ -97,8 +108,8 @@ python scripts/build_canvas.py assets/rows.example.json canvas.xlsx \
 
 ## Configure
 
-Both skills read one file describing you: what you sell, how you sound, who you are looking for,
-who is on camera. Start from [`examples/outreach-profile.yaml`](examples/outreach-profile.yaml).
+All three read one file describing you: what you sell, how you sound, who you are looking for,
+how companies are scored, and who is on camera. Start from [`examples/outreach-profile.yaml`](examples/outreach-profile.yaml).
 
 Save your real one in **your own project**, not in the installed skill directory:
 
@@ -130,8 +141,8 @@ full in
 
 Being straight about it: this is a free, MIT-licensed tool that produces the input to a paid
 product. You need a LatentCast account to render video from a canvas. You do not need one to use
-either skill, to build a canvas, or to read anything here, and the research skill is useful on its
-own regardless of what you do with the output.
+any of the skills, to build a canvas, or to read anything here, and the two research skills are
+useful on their own regardless of what you do with the output.
 
 | This repo | Canvas template |
 |-----------|-----------------|

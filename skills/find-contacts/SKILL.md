@@ -1,13 +1,12 @@
 ---
 name: find-contacts
 description: >-
-  Build an outreach-ready contact list from web research. Two steps you can use together or
-  separately: source companies by enumerating real registers and directories, then find the right
-  decision-makers at each, every person backed by a public page you can open, plus recent dated
-  signals with sources. You describe who you are and who you want to reach and it works for any
-  seller. No email addresses are generated. Use when asked to find companies in a segment, find
-  decision-makers or the right contact at a list of companies, build a prospect list, or research
-  accounts before outreach.
+  Build a scored, routed prospect list. Source companies by enumerating real registers, rate each
+  one on fit and on relevance to this campaign, route it to white-glove or cold, then find the
+  decision-makers you declared you sell to, each backed by a checkable public page. Signals and
+  personalization copy come next, from enrich-contacts. No email addresses are generated. Use when
+  asked to find companies in a segment, score or qualify a target list, find decision-makers or
+  the right contact at a list of companies, or build a prospect list.
 ---
 
 # Find contacts
@@ -16,11 +15,15 @@ Two steps. Use both, or start wherever you already are.
 
 | Step | You have | You get | Cost |
 |------|----------|---------|------|
-| **1. Source** | A segment, no list | Companies, each with a source you can open | One task per register, so cheap |
-| **2. Find people** | Companies | The right people at each, plus dated signals | One task **per company** |
+| **1. Source and score** | A segment, no list | Companies, each with a source you can open, rated and routed | One task per register, so cheap |
+| **2. Find people** | Scored companies | The right people at each | One task **per company** |
 
 A human cut sits between them, and it is not optional. Sourcing is cheap and finding people is
 not, so a bad list is expensive in a way a bad register is not.
+
+**Signals come afterwards**, from `enrich-contacts`. Splitting them is deliberate: finding the
+right person and finding a reason to contact them fail differently, and you want to cut the list
+between the two.
 
 ## Start here
 
@@ -80,14 +83,50 @@ company because its website would not load, and never guess a domain in order to
 
 Full method and the prompt: [`references/sourcing.md`](references/sourcing.md).
 
+### Score on two dimensions, and route
+
+One number cannot carry both questions, because they fail differently.
+
+**`company_fit`, 1-5, durable.** Does this company match the ICP at all? Judge it from what the
+company says about itself, not from a directory blurb or a credential.
+
+- Does the function you sell to plausibly exist here? A named department, careers listings for
+  those roles, a foreign-language site.
+- Is it big enough to have specialised? `scoring.company_fit.min_staff` in the profile. Below it,
+  most functions collapse into the owner and a certificate tells you nothing.
+- Any `disqualifiers` cap it at 2.
+
+**`campaign_relevance`, 1-5, per-campaign.** Does it match *this* angle? A company can be a 5 on
+fit and a 2 for a campaign about expansion. With no `scoring.campaign` block, everything scores 3
+here and the combined score is fit alone.
+
+**`routing` derives from the combined score**, against the thresholds in the profile. Typically
+white-glove, cold-outreach or drop. Those thresholds are the user's, because white-glove capacity
+is a business decision, not ours.
+
+> **A credential is not fit.** In a real run, scoring on accreditation inverted the ranking: the
+> company scored 3 for having none produced the best contact in the run, and one scored 4 on its
+> certificate produced nobody, because at twenty to thirty staff it had no international function
+> at all. If every `fit_reason` cites the same one attribute, you are ranking that attribute, not
+> fit. Say so.
+
+**The score travels with every downstream row.** It is not a filter that discards. A contact from
+a white-glove company gets a different motion from a cold one, and everything after this needs to
+know which.
+
 **Then stop and show the list.** Do not chain into step 2.
 
 ## Step 2: find people
 
 **One independent research task per company.** Each task sees the shared buyer block plus its own
 company, and nothing else. That isolation matters: a task that can see other companies' findings
-will attribute one company's funding round to another, fluently, and nobody notices until a
-recipient replies.
+will attribute one person to the wrong employer, fluently, and nobody notices until a recipient
+replies.
+
+Record more than a name. `primary` marks the main contact at a company, `named_by_customer` marks
+someone the customer supplied rather than research finding, and `flags` carries the caveats worth
+keeping: a profile URL that will not resolve, a domain that differs from the obvious guess, a
+title two sources disagree about.
 
 Before fanning out, three things in order:
 
@@ -112,41 +151,23 @@ reset between companies. The prompt is in
 
 ## What comes back
 
-One record per company, matching
-[`references/output-schema.json`](references/output-schema.json):
-
-```json
-{
-  "company": "Ostvale Provisions",
-  "domain": "ostvale.example.com",
-  "country": "Netherlands",
-  "status": "ok",
-  "researched_at": "2026-08-17",
-  "people": [{
-    "recipient_id": "R-0001",
-    "full_name": "Priya Raman",
-    "title": "VP Supply Chain",
-    "profile_url": "https://ostvale.example.com/about/leadership",
-    "profile_source": "company leadership page",
-    "confidence": "high",
-    "persona_match": "strong",
-    "why_right_contact": "Owns the fleet and the planning team; named as accountable for distribution, not IT."
-  }],
-  "signals": [{
-    "fact": "Opened a second distribution centre in Rotterdam",
-    "date": "2026-03",
-    "date_confidence": "month",
-    "type": "expansion",
-    "source_url": "https://ostvale.example.com/news/rotterdam-dc"
-  }]
-}
-```
-
-`recipient_id` is minted here and must stay stable. Flatten to CSV when you want one:
+Companies and contacts, matching
+[`references/pipeline-contract.md`](references/pipeline-contract.md). Assemble into a workbook:
 
 ```bash
-python3 scripts/rows_to_csv.py out/records/ contacts.csv
+python3 scripts/build_workbook.py records.json targets.xlsx --csv flat.csv
 ```
+
+Four sheets: **Companies · Contacts · Signals · Open items**. Signals is empty at this stage and
+fills when `enrich-contacts` runs. The CSV is a lossy export for spreadsheet work, not the
+canonical form.
+
+`recipient_id` is minted here and must stay stable. It is the resume key for every later stage.
+
+**Open items are a first-class output.** Anything a human must decide before a send goes there:
+a company dropped on headcount that holds a credential, a title two sources disagree on, a
+register that would not load. A consolidated list is what gets walked through on a call; per-row
+notes are not a substitute.
 
 ## Failure is a record, not an absence
 
@@ -161,15 +182,17 @@ answer rather than a failure.
 
 Ten, in [`references/quality-rules.md`](references/quality-rules.md). The load-bearing ones:
 
-1. **One verified person beats three guesses.** No checkable public page showing them in the
+1. **Are they there now**, not do they exist. Stale org charts beat fabrication as the failure
+   mode: in one run four organisations returned a real person, a real profile and a right title
+   for someone who had left. Find a date.
+2. **One verified person beats three guesses.** No checkable public page showing them in the
    role, no person.
-2. **Four signal gates:** the source states it, it is this company, it is inside the window with
-   the year established, and the reading is correct.
-3. **Date every signal** to `YYYY-MM` at minimum, with a confidence.
+3. **An index you cannot open is not verification.** Sole-source cached evidence caps confidence
+   at medium.
 4. **Title drift is systematic.** Company sites run ahead of profiles, about-pages run behind.
    Flag the conflict, do not silently pick.
 5. **A fetch failure is not evidence of non-existence.** Run a known-good control through the
-   same tool before concluding a profile is fake.
+   same tool first.
 
 A good run has some `partial` records and some companies that returned nobody. A run where every
 row is full and every person is high confidence is a run to check.

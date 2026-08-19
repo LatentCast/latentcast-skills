@@ -87,6 +87,47 @@ buyer:
   per_company: 2
 
 # ---------------------------------------------------------------------------
+# scoring — how companies are rated and routed. Read by find-contacts.
+#
+# Two dimensions, because they fail differently. A company can be a 5 on fit and a 2
+# for a campaign about EU expansion. Both travel with every downstream row: the score
+# is a decision that follows the contact, not a filter that discards it.
+# ---------------------------------------------------------------------------
+scoring:
+  # company_fit: durable. Does this company match the ICP at all?
+  company_fit:
+    # What earns a high score. Written as things you could check on their own site.
+    signals_of_fit:
+      - "runs its own delivery fleet rather than outsourcing"
+      - "multi-depot, so planning is a real job rather than a spreadsheet"
+      - "publishes delivery windows or service-level promises"
+    # Below this, most functions collapse into the owner and a credential tells you
+    # nothing about whether the role you sell to exists. Set it for your buyer.
+    min_staff: 50
+    # Disqualifiers. Any of these caps company_fit at 2.
+    disqualifiers:
+      - "freight broker with no vehicles"
+      - "single depot and no expansion signals"
+
+  # campaign_relevance: per-campaign. Does this company match THIS angle?
+  # Leave the campaign block out entirely and every company scores 3 here.
+  campaign:
+    name: "Multi-depot expansion, autumn"
+    angle: "companies adding a second or third depot, where hand-built routes stop scaling"
+    relevance_signals:
+      - "opened or announced a new depot in the last 12 months"
+      - "entering a new country or region"
+
+  # routing: what happens to a company at each combined score. White-glove capacity is
+  # a business decision, so these are yours, not ours.
+  routing:
+    5: "white-glove"
+    4: "cold-outreach"
+    3: "cold-outreach"
+    2: "drop"
+    1: "drop"
+
+# ---------------------------------------------------------------------------
 # research — what counts as a signal. Read by find-contacts only.
 # ---------------------------------------------------------------------------
 research:
@@ -120,6 +161,29 @@ offer:
   variants:
     - audience: "3pl"
       offer: "add {product_noun} to the networks you run for your clients, so a new account does not mean a new planner"
+
+# ---------------------------------------------------------------------------
+# sequence — OPTIONAL. Only needed if you ask enrich-contacts for personalization
+# copy. Without this block it produces signals and angles and stops there.
+#
+# An angle is research: one line on how your offer connects to an event.
+# perso_1..4 are send-ready EMAIL copy, one block per step of your sequence.
+# Neither is the canvas welcome/CTA, which is viewing-page copy read beside the player.
+# ---------------------------------------------------------------------------
+sequence:
+  steps:
+    - id: perso_1
+      purpose: "First touch. Congratulate the event, then the offer."
+      length: "two sentences"
+    - id: perso_2
+      purpose: "Follow-up. A different angle on the same company, never a nudge."
+      length: "one sentence"
+    - id: perso_3
+      purpose: "Third touch. Something useful with no ask attached."
+      length: "one sentence"
+    - id: perso_4
+      purpose: "Break-up. Warm, no guilt, leaves the door open."
+      length: "one sentence"
 
 # ---------------------------------------------------------------------------
 # canvas — the campaign's video settings. Read by build-personalization-canvas only.

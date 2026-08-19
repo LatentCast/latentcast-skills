@@ -109,7 +109,9 @@ PRIVATE = {
         r"\b(SmartLead|Findymail|Prospeo|BrandFetch|Langfuse|Mintlify|Fathom)\b", re.I),
     "internal repo or path": re.compile(
         r"/Users/|Sales-Marketing-Agent|SharePoint|OneDrive|\.claude/workflows|drafts/pilot"),
-    "internal shorthand": re.compile(r"\bmini-pilot\b|\bperso_[0-9]\b|\bScore-10\b", re.I),
+    # perso_1..4 was internal shorthand until it became a documented public field name for
+    # the sequence copy. mini-pilot and Score-10 still name internal work.
+    "internal shorthand": re.compile(r"\bmini-pilot\b|\bScore-10\b", re.I),
     "wiki link": re.compile(r"\[\[[^\]\n]+\]\]"),
     "brand font": re.compile(r"IBM Plex", re.I),
 }
@@ -160,12 +162,21 @@ def test_no_v5_column_letters():
 
 # --- parity ---------------------------------------------------------------
 
-PROFILE_COPIES = [
-    REPO / "skills" / "find-contacts" / "references" / "outreach-profile.example.yaml",
-    REPO / "skills" / "build-personalization-canvas" / "references"
-         / "outreach-profile.example.yaml",
-    REPO / "examples" / "outreach-profile.yaml",
-]
+SKILLS = ["find-contacts", "enrich-contacts", "build-personalization-canvas"]
+
+PROFILE_COPIES = [REPO / "examples" / "outreach-profile.yaml"] + [
+    REPO / "skills" / s / "references" / "outreach-profile.example.yaml" for s in SKILLS]
+
+# The CLI copies only the skill directory, so a doc every skill needs must live in each of
+# them. The duplication is forced by the install mechanics, not chosen, so it needs enforcing.
+CONTRACT_COPIES = [REPO / "skills" / s / "references" / "pipeline-contract.md" for s in SKILLS]
+
+
+def test_pipeline_contract_copies_are_identical():
+    texts = {p: p.read_text(encoding="utf-8") for p in CONTRACT_COPIES}
+    first = next(iter(texts.values()))
+    differing = [p.relative_to(REPO) for p, t in texts.items() if t != first]
+    assert not differing, f"pipeline contract copies have drifted: {differing}"
 
 
 def test_profile_copies_are_identical():
@@ -243,7 +254,7 @@ def test_examples_parse():
 
 # --- skill discovery ------------------------------------------------------
 
-@pytest.mark.parametrize("skill", ["find-contacts", "build-personalization-canvas"])
+@pytest.mark.parametrize("skill", SKILLS)
 def test_skill_frontmatter(skill):
     """The CLI needs name and description. Keep it to those two for portability."""
     text = (REPO / "skills" / skill / "SKILL.md").read_text(encoding="utf-8")
