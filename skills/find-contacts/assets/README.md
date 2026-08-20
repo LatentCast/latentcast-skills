@@ -1,6 +1,6 @@
 # Sample data
 
-Three things. One is real, two are invented, and it matters which is which.
+Two things. One is real, one is invented, and it matters which is which.
 
 ## `companies.example.csv` — real, on purpose
 

@@ -50,42 +50,35 @@ WHY WE ARE REACHING OUT
   {{seller.company}} sells {{seller.product_noun}}: {{seller.what_it_does}}.
   Typically to {{seller.who_you_sell_to}}.
 
-WHAT COUNTS AS A SIGNAL
-  Events at this company from the last {{options.recency_months}} months.
-  Ranked: {{research.signal_priority}}
-  Ignore: {{research.signal_types_to_ignore}}
-  Up to {{options.signals_per_unit}}.
+SCORE THE COMPANY
+  company_fit, 1-5, judged from what the company says about ITSELF on its own site.
+  The rubric is the user's, given below. There is no built-in idea of a good company.
+{{scoring.company_fit rubric, verbatim}}
+  Any of these caps the score at 2: {{scoring.company_fit.disqualifiers}}
 
-PEOPLE RULES
-  - Every person needs a checkable public page showing THEM, in THIS role, at THIS
-    company. A professional profile, a leadership page, a dated press release, a
-    speaker page. Record which kind it was.
-  - If you cannot find one, OMIT the person. One verified person beats three guesses.
-  - why_right_contact must name WHICH title rule or persona clause they satisfy.
-    "Senior leader at the company" is not a justification.
-  - Set persona_match honestly: strong, adjacent, or fallback.
-  - Sources disagree about titles routinely. Company sites run ahead of profiles,
-    about-pages run behind. Prefer a dated primary source and set role_status to
-    conflicting rather than silently choosing.
-  - A page that will not load is not evidence a person is invented. If a fetch fails,
-    fetch a page you know is good of the same kind as a control before concluding
-    anything.
+  campaign_relevance, 1-5, against THIS campaign only:
+{{scoring.campaign.angle and relevance_signals, or "no campaign set — score 3"}}
 
-SIGNAL RULES
-  Every signal passes all four gates:
-   1. The source states it. Not implied, not inferred from a headline.
-   2. It is about THIS company, not a same-named one elsewhere.
-   3. It falls inside the window. Establish the actual YEAR. Undated pages read as
-      current and are often years old.
-   4. The reading is correct. A pilot is not a rollout. A funding round is not a
-      valuation. "Named to a list" is not "won the award".
-  Date every signal YYYY-MM at minimum and say how sure you are.
-  source_url is the page that states it, never a search results page.
+  fit_reason: one line, in the company's own words, saying why that score.
+  If your reason for every company cites the same one attribute, you are ranking that
+  attribute rather than fit. Say so instead of pretending the number means fit.
+
+  Do NOT research signals or recent events here. That is a separate step with its own
+  gates, and doing it now doubles the cost of a list that has not been cut yet.
+
+RECORD THE CAVEATS
+  primary            is this the main contact at the company
+  named_by_customer  did the customer supply this person, rather than research finding
+                     them. Changes how much verification is owed.
+  flags              anything worth carrying: a LinkedIn URL that will not resolve, a
+                     domain that differs from the obvious guess, a title two sources
+                     disagree about.
+  open_items         anything a HUMAN must decide before a send. These collect into
+                     their own sheet and are what gets walked through on a call.
 
 REFUSAL RULE
-  Returning fewer people, fewer signals, or none at all is a correct answer for a
-  company with thin public information. Say so in notes and set status. Do not fill
-  the gap.
+  Returning fewer people, or none at all, is a correct answer for a company with thin
+  public information. Say so in notes and set status. Do not fill the gap.
 
 OUTPUT
   Return exactly one JSON object matching the record contract, and nothing else.

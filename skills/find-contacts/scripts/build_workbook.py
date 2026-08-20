@@ -15,6 +15,7 @@ Run:
     uv run --quiet --with "openpyxl>=3.1,<4" python build_workbook.py records.json out.xlsx
 """
 import argparse
+import datetime as dt
 import html
 import json
 import sys
@@ -146,11 +147,61 @@ def to_csv(data, path):
     return len(parts["contacts"])
 
 
+def months_between(then, now):
+    """Whole months between two YYYY[-MM] strings. None if unparseable."""
+    def parse(text):
+        parts = str(text or "").split("-")
+        if not parts or not parts[0].isdigit():
+            return None
+        month = int(parts[1]) if len(parts) > 1 and parts[1].isdigit() else 1
+        return int(parts[0]), month
+    a, b = parse(then), parse(now)
+    return None if not a or not b else (b[0] - a[0]) * 12 + (b[1] - a[1])
+
+
+def audit(data, today):
+    """What a reader should check before sending. Printed to stderr, never silent."""
+    parts = unpack(data)
+    notes = []
+    window = 6
+    for c in parts["companies"]:
+        window = c.get("recency_window_months") or window
+    stale, nobody, fallback = [], [], []
+    people_by_company = {}
+    for p in parts["contacts"]:
+        people_by_company.setdefault(p.get("company"), []).append(p)
+        if p.get("persona_match") == "fallback":
+            fallback.append(p.get("full_name") or p.get("company"))
+    sig_by_company = {}
+    for s in parts["signals"]:
+        sig_by_company.setdefault(s.get("company"), []).append(s)
+    for c in parts["companies"]:
+        name = c.get("company")
+        if not people_by_company.get(name):
+            nobody.append(name)
+        ages = [m for m in (months_between(s.get("date"), today)
+                            for s in sig_by_company.get(name, [])) if m is not None]
+        if ages and min(ages) > window:
+            stale.append(f"{name} (oldest usable signal {min(ages)} months, window {window})")
+    if nobody:
+        notes.append(f"{len(nobody)} companies returned nobody: " + ", ".join(nobody))
+    if stale:
+        notes.append(f"{len(stale)} companies have only stale signals: " + "; ".join(stale))
+    if fallback:
+        notes.append(f"{len(fallback)} people matched the buyer only as a fallback: "
+                     + ", ".join(filter(None, fallback))
+                     + ". A long list here means the buyer definition is too vague; fix it "
+                       "upstream rather than filtering out the rows.")
+    return notes
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(prog="build_workbook.py")
     ap.add_argument("records")
     ap.add_argument("out")
     ap.add_argument("--csv", help="also write a flat CSV export")
+    ap.add_argument("--today", default=dt.date.today().isoformat(),
+                    help="date for the staleness audit. Defaults to today.")
     ap.add_argument("--version", action="version", version=f"build_workbook {__version__}")
     a = ap.parse_args(argv)
     try:
@@ -163,6 +214,8 @@ def main(argv=None):
           + f" (build_workbook {__version__})")
     if a.csv:
         print(f"wrote {a.csv} — {to_csv(data, a.csv)} rows (flat export, signals capped at 3)")
+    for note in audit(data, a.today):
+        print(f"note: {note}", file=sys.stderr)
     if not counts["Open items"]:
         print("note: no open items. A run with nothing needing a human is unusual; check you "
               "are recording them.", file=sys.stderr)

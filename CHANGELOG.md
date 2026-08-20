@@ -3,6 +3,40 @@
 Format per [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning per [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] — unreleased
+
+### Changed
+
+Three skills instead of two, matching how the pipeline actually runs: find, enrich, then
+build the canvas. Finding the right person and finding a reason to contact them fail
+differently, and you want to cut the list between the two.
+
+- **`find-contacts` now scores and routes.** Two dimensions, because they fail differently:
+  `company_fit` is durable, `campaign_relevance` is per-campaign, and a company can be a 5 on
+  one and a 2 on the other. There is deliberately **no built-in rubric** — a seller targeting
+  enterprises and one targeting startups want opposite things, so the user writes what a 5 and
+  a 1 look like in their own words. The score travels with every downstream row rather than
+  being a filter that discards.
+- **`enrich-contacts` is new.** Dated, sourced signals, each with an opening angle. Angles are
+  research and always produced. `perso_1`..`perso_4`, the send-ready email copy for a sequence,
+  are opt-in and need a `sequence` block; the skill asks how many emails you actually send
+  rather than assuming four.
+- **Output is a four-sheet workbook**: Companies, Contacts, Signals, Open items. Signals stay
+  one row each, because flattening to `signal1/2/3` silently loses the fourth. Open items are a
+  first-class output, since a consolidated "needs a human before you send" list is what gets
+  walked through on a call and per-row notes are not a substitute.
+- **Restored the fields that carry judgement**: `staff`, `hq`, `primary`, `named_by_customer`,
+  `flags`, `liveness`.
+- `profile_url` is now `linkedin_url`, matching what real pipelines key on, with
+  `corroborated_by` as a separate field for a second page actually fetched.
+- `rows_to_csv.py` is retired; `build_workbook.py --csv` does the same job and carries the
+  staleness audit.
+
+### Notes
+
+Three surfaces, three registers, and conflating them is the most common mistake: scene cells are
+heard, canvas welcome and CTA are read beside the player, and `perso_*` is email.
+
 ## [0.1.0] — unreleased
 
 First public release.

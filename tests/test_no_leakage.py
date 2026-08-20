@@ -198,6 +198,8 @@ SAMPLE_COPIES = [
      "skills/build-personalization-canvas/assets/rows.example.json"),
     ("examples/contacts.example.json",
      "skills/build-personalization-canvas/assets/contacts.example.json"),
+    ("examples/enriched.example.json",
+     "skills/build-personalization-canvas/assets/enriched.example.json"),
 ]
 
 

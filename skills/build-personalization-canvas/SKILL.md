@@ -4,10 +4,10 @@ description: >-
   Turn a list of researched contacts into a LatentCast Personalization Canvas (Template v6),
   the 26-column xlsx that drives personalized video generation. One pass per recipient rewrites
   research signals into the video register: tight scene cells written to be heard, and short
-  viewing-page copy, neither of them email prose. A builder script then assembles the workbook. You declare who you are and what you sell
-  in an outreach profile, so it works for any seller and any audience. Use when you have contacts
-  plus signals and need the canvas that drives personalized video, or when asked to build the
-  canvas, make the personalization sheet, or fill the perso canvas.
+  viewing-page copy, neither of them email prose. A builder script then assembles the workbook.
+  You declare who you are and what you sell in an outreach profile, so it works for any seller.
+  Use when you have contacts plus signals and need the canvas that drives personalized video, or
+  when asked to build the canvas, make the personalization sheet, or fill the perso canvas.
 ---
 
 # Build a Personalization Canvas
@@ -22,7 +22,7 @@ must not be altered. Everything spoken in the video comes from your outreach pro
 
 - **Python 3.10 or later**, and `openpyxl`. No other dependency, no API key, no account needed
   to build a canvas.
-- **A outreach profile.** See below.
+- **An outreach profile.** See below.
 - **An agent that can work through a list.** One at a time is fine. Several at once is faster.
 
 ## Your outreach profile
@@ -88,7 +88,12 @@ Full column map: [`references/canvas-v6.md`](references/canvas-v6.md).
 
 ## Input
 
-A JSON array of contacts, snake_case. From `find-contacts` this needs no transformation.
+**`enrich-contacts` output, unchanged.** A JSON array of company records, each carrying `people`
+and `signals`, matching [`references/pipeline-contract.md`](references/pipeline-contract.md). A
+flat array of contacts with nested `signals` also works.
+
+One row per person: a company with two contacts produces two canvas rows, sharing that company's
+signals but each with its own copy.
 
 ```json
 {
@@ -110,8 +115,14 @@ A JSON array of contacts, snake_case. From `find-contacts` this needs no transfo
 }
 ```
 
-`recipient_id` and `company` are required. Everything else is optional, and a missing `signals`
-array means the copy must lead with the offer rather than invent an event.
+`recipient_id` and `company` are required. A missing `signals` array means the copy leads with
+the offer rather than inventing an event.
+
+**Two fields from upstream change what you write.** `routing` says whether this is a white-glove
+or a cold contact, and the register differs: a white-glove recipient has usually had human
+contact, so `relationship_context` should say so rather than reading "cold prospect". And
+`perso_1`, if `enrich-contacts` produced it, is the **email** copy for this person — do not paste
+it into `welcome_message`, which is read on the viewing page. Same facts, different surface.
 
 ## The per-recipient pass
 
@@ -217,8 +228,8 @@ exact spreadsheet rows that need a hand.
 
 ### Assembling the row
 
-Merge the returned six cells with the contact's identity fields and the campaign settings from
-`canvas.look_and_feel` and `canvas.rep`. Every identity column A to G must be filled, `email`
+Merge the returned six cells with the contact's identity fields, the company's `industry` and
+`country`, and the campaign settings from `canvas.look_and_feel` and `canvas.rep`. Every identity column A to G must be filled, `email`
 included.
 
 Leave the four imagery cells blank unless you have uploaded images to the personalization

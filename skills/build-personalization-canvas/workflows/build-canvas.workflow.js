@@ -30,7 +30,23 @@ const SCHEMA = {
 }
 
 const input = args || {}
-const contacts = input.contacts || input.rows || []
+
+// Accept either a flat contact array or find-contacts/enrich-contacts records, which nest
+// people and signals under each company. Flatten to one entry per person, carrying the
+// company's fields and signals down.
+function flatten(raw) {
+  const list = raw || []
+  if (!list.length || !list[0].people) return list
+  return list.flatMap((rec) => {
+    const { people = [], signals = [], ...company } = rec
+    return people.map((p) => ({
+      ...company,
+      ...p,
+      signals: signals.filter((s) => !s.recipient_id || s.recipient_id === p.recipient_id),
+    }))
+  })
+}
+const contacts = flatten(input.contacts || input.records || input.rows)
 const profile = input.profile || {}
 const seller = profile.seller || {}
 const offer = profile.offer || {}
@@ -149,7 +165,13 @@ const rows = results.map(({ c, r }, i) => {
     company_spoken: c.company_spoken || c.company || '',
     triggering_event: (r && r.triggering_event) || '',
     // per-row when supplied, campaign default otherwise. Not hardcoded to "None".
-    relationship_context: c.relationship_context || look.relationship_context || '',
+    // A white-glove contact has usually had human contact, so "cold prospect" would be
+    // wrong. Upstream routing decides which default applies.
+    relationship_context: c.relationship_context
+      || (String(c.routing || '').toLowerCase() === 'white-glove'
+            ? (look.relationship_context_warm || '')
+            : look.relationship_context)
+      || '',
     strategic_priorities: (r && r.strategic_priorities) || '',
     relevance_signals: (r && r.relevance_signals) || '',
     // "Deduct from Context" is a ROW-3 TOGGLE state, never a cell value. Blank here means

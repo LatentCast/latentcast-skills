@@ -40,9 +40,8 @@ jobs:
             echo "validate_config should reject the unedited example profile"; exit 1
           fi
 
-      - name: Regenerate the sample CSV and confirm it is committed up to date
+      - name: Build the four-sheet workbook from the enriched example
         run: |
-          python3 skills/find-contacts/scripts/rows_to_csv.py \
-            skills/find-contacts/assets/record.example.json \
-            /tmp/output.csv --today 2026-08-17
-          diff /tmp/output.csv skills/find-contacts/assets/output.example.csv
+          python skills/find-contacts/scripts/build_workbook.py \
+            examples/enriched.example.json /tmp/enriched.xlsx --csv /tmp/enriched.csv
+          test -f /tmp/enriched.xlsx

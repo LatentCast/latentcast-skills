@@ -156,7 +156,7 @@ Companies and contacts, matching
 [`references/pipeline-contract.md`](references/pipeline-contract.md). Assemble into a workbook:
 
 ```bash
-python3 scripts/build_workbook.py records.json targets.xlsx --csv flat.csv
+python3 scripts/build_workbook.py records.json targets.xlsx --csv flat.csv --today 2026-08-20
 ```
 
 Four sheets: **Companies · Contacts · Signals · Open items**. Signals is empty at this stage and
@@ -164,6 +164,10 @@ fills when `enrich-contacts` runs. The CSV is a lossy export for spreadsheet wor
 canonical form.
 
 `recipient_id` is minted here and must stay stable. It is the resume key for every later stage.
+
+The builder also prints an audit to stderr: companies that returned nobody, companies whose only
+signals are stale, and people who matched the buyer as a `fallback`. A long fallback list means
+the buyer definition is too vague, and the fix is upstream rather than deleting rows.
 
 **Open items are a first-class output.** Anything a human must decide before a send goes there:
 a company dropped on headcount that holds a credential, a title two sources disagree on, a

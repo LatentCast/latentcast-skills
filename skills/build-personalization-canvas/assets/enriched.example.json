@@ -1,0 +1,195 @@
+[
+  {
+    "company": "Ostvale Provisions",
+    "domain": "ostvale.example.com",
+    "country": "Netherlands",
+    "industry": "Food distribution",
+    "audience": "distributor",
+    "segment": "distributor",
+    "hq": "Rotterdam",
+    "staff": 180,
+    "site_count": 1,
+    "company_fit": 5,
+    "campaign_relevance": 5,
+    "score": 5,
+    "routing": "white-glove",
+    "fit_reason": "Own fleet, in-house planners, second depot just opened; planning is somebody's job.",
+    "liveness": "verified-200",
+    "evidence_url": "https://register.example/members/ostvale",
+    "status": "ok",
+    "notes": "",
+    "researched_at": "2026-08-20",
+    "people": [
+      {
+        "recipient_id": "R-0001",
+        "full_name": "Priya Raman",
+        "first_name": "Priya",
+        "last_name": "Raman",
+        "title": "VP Supply Chain",
+        "linkedin_url": "https://www.linkedin.com/in/priya-raman-example",
+        "corroborated_by": "https://ostvale.example.com/about/leadership",
+        "profile_source": "linkedin, corroborated on the company site",
+        "confidence": "high",
+        "persona_match": "strong",
+        "why_right_contact": "Owns the fleet and the planning team; the leadership page names her as accountable for distribution, not IT.",
+        "email": "",
+        "role_status": "confirmed",
+        "primary": "yes",
+        "named_by_customer": "no",
+        "flags": ""
+      }
+    ],
+    "signals": [
+      {
+        "fact": "Opened a second distribution centre in Rotterdam, roughly doubling northern-Europe throughput",
+        "date": "2026-03",
+        "date_confidence": "month",
+        "type": "expansion",
+        "source_url": "https://ostvale.example.com/news/rotterdam-dc",
+        "recipient_id": "R-0001",
+        "angle": "A second depot is where hand-built routes stop scaling."
+      },
+      {
+        "fact": "Stated intent to serve Germany and Denmark from the new site",
+        "date": "2026-03",
+        "date_confidence": "month",
+        "type": "expansion",
+        "source_url": "https://ostvale.example.com/news/rotterdam-dc",
+        "recipient_id": "R-0001",
+        "angle": "A second depot is where hand-built routes stop scaling."
+      },
+      {
+        "fact": "Runs its own fleet with routes planned in-house; no dynamic routing in the published stack",
+        "date": "2026-01",
+        "date_confidence": "approximate",
+        "type": "milestone",
+        "source_url": "https://ostvale.example.com/how-we-deliver",
+        "recipient_id": "R-0001",
+        "angle": "A second depot is where hand-built routes stop scaling."
+      }
+    ],
+    "open_items": []
+  },
+  {
+    "company": "Quernvale Bakery Group",
+    "domain": "quernvale.example.com",
+    "country": "Sweden",
+    "industry": "Bakery and chilled foods",
+    "audience": "distributor",
+    "segment": "distributor",
+    "hq": "Malm\u00f6",
+    "staff": 60,
+    "site_count": 1,
+    "company_fit": 3,
+    "campaign_relevance": 3,
+    "score": 3,
+    "routing": "cold-outreach",
+    "fit_reason": "Runs its own deliveries but from a single site, and says nothing about how routes are planned.",
+    "liveness": "verified-200",
+    "evidence_url": "https://register.example/members/quernvale",
+    "status": "ok",
+    "notes": "",
+    "researched_at": "2026-08-20",
+    "people": [
+      {
+        "recipient_id": "R-0002",
+        "full_name": "Tomas Lindqvist",
+        "first_name": "Tomas",
+        "last_name": "Lindqvist",
+        "title": "Head of Distribution",
+        "linkedin_url": "https://www.linkedin.com/in/tomas-lindqvist-example",
+        "corroborated_by": "https://quernvale.example.com/en/team",
+        "profile_source": "linkedin, corroborated on the company site",
+        "confidence": "medium",
+        "persona_match": "strong",
+        "why_right_contact": "Named on the team page as running distribution. No sales or IT remit listed.",
+        "email": "",
+        "role_status": "confirmed",
+        "primary": "yes",
+        "named_by_customer": "no",
+        "flags": ""
+      }
+    ],
+    "signals": [
+      {
+        "fact": "Added a chilled range to the daily delivery run",
+        "date": "2026-05",
+        "date_confidence": "approximate",
+        "type": "product launch",
+        "source_url": "https://quernvale.example.com/en/ranges/chilled",
+        "recipient_id": "R-0002",
+        "angle": "Chilled on the same run tightens every morning window."
+      }
+    ],
+    "open_items": [
+      {
+        "item": "Only one weak signal, and it is undated",
+        "affects": "Quernvale Bakery Group",
+        "status": "check before use",
+        "detail": "The chilled range page carries no date. Copy leads with the offer instead."
+      }
+    ]
+  },
+  {
+    "company": "Fellgate Logistics",
+    "domain": "fellgate.example.com",
+    "country": "Ireland",
+    "industry": "Third-party logistics",
+    "audience": "3pl",
+    "segment": "3pl",
+    "hq": "Dublin",
+    "staff": 140,
+    "site_count": 1,
+    "company_fit": 5,
+    "campaign_relevance": 4,
+    "score": 4,
+    "routing": "cold-outreach",
+    "fit_reason": "Four depots and a planner per account, so planning is a real cost centre.",
+    "liveness": "verified-200",
+    "evidence_url": "https://register.example/members/fellgate",
+    "status": "ok",
+    "notes": "",
+    "researched_at": "2026-08-20",
+    "people": [
+      {
+        "recipient_id": "R-0003",
+        "full_name": "Aisha Bello",
+        "first_name": "Aisha",
+        "last_name": "Bello",
+        "title": "Managing Director",
+        "linkedin_url": "https://www.linkedin.com/in/aisha-bello-example",
+        "corroborated_by": "https://fellgate.example.com/about",
+        "profile_source": "linkedin, corroborated on the company site",
+        "confidence": "high",
+        "persona_match": "strong",
+        "why_right_contact": "Third-party logistics provider, so the segment rule applies and the buyer is the principal rather than a functional VP.",
+        "email": "",
+        "role_status": "confirmed",
+        "primary": "yes",
+        "named_by_customer": "no",
+        "flags": ""
+      }
+    ],
+    "signals": [
+      {
+        "fact": "Won a three-year contract to run ambient distribution for a grocery group",
+        "date": "2026-06",
+        "date_confidence": "month",
+        "type": "contract win",
+        "source_url": "https://fellgate.example.com/news/ambient-contract",
+        "recipient_id": "R-0003",
+        "angle": "A new account should not mean a new planner."
+      },
+      {
+        "fact": "Operates four regional depots for a mix of retail and foodservice clients",
+        "date": "2026-02",
+        "date_confidence": "approximate",
+        "type": "milestone",
+        "source_url": "https://fellgate.example.com/network",
+        "recipient_id": "R-0003",
+        "angle": "A new account should not mean a new planner."
+      }
+    ],
+    "open_items": []
+  }
+]
