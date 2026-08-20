@@ -53,7 +53,7 @@ differently from a cold one, and the canvas needs to know which.
 |---|---|
 | `recipient_id` | Minted here, stable. The resume key for every later stage |
 | `full_name`, `first_name`, `last_name`, `title` | |
-| `profile_url`, `profile_source` | A checkable public page showing them in the role, and what kind of page it is |
+| `linkedin_url`, `profile_source` | A checkable public page showing them in the role, and what kind of page it is |
 | `email` | **Blank.** This skill does not generate addresses. The canvas requires it, so fill from a CRM or a verified-email provider |
 | `confidence` | `high` / `medium` / `low`. `high` requires a page actually fetched, not a cached index |
 | `persona_match` | `strong` / `adjacent` / `fallback`. Honest self-report against the declared buyer |

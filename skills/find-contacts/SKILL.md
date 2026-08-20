@@ -87,14 +87,15 @@ Full method and the prompt: [`references/sourcing.md`](references/sourcing.md).
 
 One number cannot carry both questions, because they fail differently.
 
-**`company_fit`, 1-5, durable.** Does this company match the ICP at all? Judge it from what the
-company says about itself, not from a directory blurb or a credential.
+**`company_fit`, 1-5, durable.** Does this company match the ICP at all?
 
-- Does the function you sell to plausibly exist here? A named department, careers listings for
-  those roles, a foreign-language site.
-- Is it big enough to have specialised? `scoring.company_fit.min_staff` in the profile. Below it,
-  most functions collapse into the owner and a certificate tells you nothing.
-- Any `disqualifiers` cap it at 2.
+**The rubric is the user's, written in their own words in `scoring.company_fit`.** There is no
+built-in definition of a good company and there should not be: a seller targeting enterprises and
+one targeting startups want opposite things, and a tool that assumes either is quietly wrong for
+the other half of its users. If the profile has no rubric, ask for one before scoring anything.
+
+Judge against it from **what the company says about itself**, not from a directory blurb or a
+credential. Any `disqualifiers` cap the score at 2 regardless of everything else.
 
 **`campaign_relevance`, 1-5, per-campaign.** Does it match *this* angle? A company can be a 5 on
 fit and a 2 for a campaign about expansion. With no `scoring.campaign` block, everything scores 3

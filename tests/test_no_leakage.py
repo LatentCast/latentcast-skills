@@ -240,8 +240,15 @@ def test_example_domains_are_reserved():
         text = (REPO / name).read_text(encoding="utf-8")
         for url in re.findall(r"https?://[^\s\"',]+", text):
             host = url.split("//", 1)[1].split("/", 1)[0]
-            if not (host.endswith(".example") or ".example." in host):
-                bad.append(f"{name}: {url}")
+            if host.endswith(".example") or ".example." in host:
+                continue
+            # linkedin_url has to show its real shape or the examples teach the wrong
+            # format. Permitted only with an -example slug, which cannot collide with a
+            # real profile the way an invented plausible name could.
+            linkedin = re.fullmatch(r"(www\.)?linkedin\.com", host)
+            if linkedin and url.rstrip("/").endswith("-example"):
+                continue
+            bad.append(f"{name}: {url}")
     assert not bad, "non-reserved domains in a worked example:\n  " + "\n  ".join(bad)
 
 

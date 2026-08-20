@@ -11,8 +11,7 @@
     "country": "Netherlands",
     "industry": "Food distribution",
     "audience": "distributor",
-    "profile_url": "https://ostvale.example.com/about/leadership",
-    "profile_source": "company leadership page",
+    "profile_source": "linkedin, corroborated on the company site",
     "confidence": "high",
     "persona_match": "strong",
     "why_right_contact": "Owns the fleet and the planning team; the leadership page names her as accountable for distribution, not IT.",
@@ -41,7 +40,9 @@
     ],
     "status": "ok",
     "notes": "",
-    "researched_at": "2026-08-17"
+    "researched_at": "2026-08-17",
+    "linkedin_url": "https://www.linkedin.com/in/priya-raman-example",
+    "corroborated_by": "https://ostvale.example.com/about/leadership"
   },
   {
     "recipient_id": "R-0002",
@@ -55,8 +56,7 @@
     "country": "Sweden",
     "industry": "Bakery and chilled foods",
     "audience": "distributor",
-    "profile_url": "https://quernvale.example.com/en/team",
-    "profile_source": "company team page",
+    "profile_source": "linkedin, corroborated on the company site",
     "confidence": "medium",
     "persona_match": "strong",
     "why_right_contact": "Named on the team page as running distribution. No sales or IT remit listed.",
@@ -71,7 +71,9 @@
     ],
     "status": "partial",
     "notes": "Only one signal found, and it is weak. No dated announcement, funding or expansion in the recency window. Kept because the fit is good; the copy should lead with the offer rather than congratulate a non-event.",
-    "researched_at": "2026-08-17"
+    "researched_at": "2026-08-17",
+    "linkedin_url": "https://www.linkedin.com/in/tomas-lindqvist-example",
+    "corroborated_by": "https://quernvale.example.com/en/team"
   },
   {
     "recipient_id": "R-0003",
@@ -85,8 +87,7 @@
     "country": "Ireland",
     "industry": "Third-party logistics",
     "audience": "3pl",
-    "profile_url": "https://fellgate.example.com/about",
-    "profile_source": "company about page",
+    "profile_source": "linkedin, corroborated on the company site",
     "confidence": "high",
     "persona_match": "strong",
     "why_right_contact": "Third-party logistics provider, so the segment rule applies and the buyer is the principal rather than a functional VP.",
@@ -108,6 +109,8 @@
     ],
     "status": "ok",
     "notes": "",
-    "researched_at": "2026-08-17"
+    "researched_at": "2026-08-17",
+    "linkedin_url": "https://www.linkedin.com/in/aisha-bello-example",
+    "corroborated_by": "https://fellgate.example.com/about"
   }
 ]

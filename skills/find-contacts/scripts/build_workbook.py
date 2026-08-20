@@ -35,8 +35,9 @@ SHEETS = {
     ],
     "Contacts": [
         ("recipient_id", 12), ("company", 26), ("full_name", 20), ("first_name", 13),
-        ("last_name", 14), ("title", 30), ("email", 26), ("profile_url", 40),
-        ("profile_source", 22), ("role_status", 13), ("role_source_url", 34),
+        ("last_name", 14), ("title", 30), ("email", 26), ("linkedin_url", 40),
+        ("profile_source", 22),
+        ("corroborated_by", 34), ("role_status", 13), ("role_source_url", 34),
         ("primary", 9), ("named_by_customer", 17), ("persona_match", 14),
         ("confidence", 11), ("why_right_contact", 60), ("flags", 40),
     ],

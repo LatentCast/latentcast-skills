@@ -34,7 +34,7 @@ So for every person:
 
 ## 1. One verified person beats three guesses
 
-Every person needs a `profile_url`: a checkable public page showing **this person, in this role,
+Every person needs a `linkedin_url`: a checkable public page showing **this person, in this role,
 at this company**. A professional network profile, a company leadership page, a dated press
 release, a conference speaker page. Any of those.
 

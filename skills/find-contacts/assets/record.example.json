@@ -16,13 +16,14 @@
         "first_name": "Priya",
         "last_name": "Raman",
         "title": "VP Supply Chain",
-        "profile_url": "https://ostvale.example.com/about/leadership",
-        "profile_source": "company leadership page",
+        "profile_source": "linkedin, corroborated on the company site",
         "confidence": "high",
         "persona_match": "strong",
         "why_right_contact": "Satisfies the 'accountable for what a delivery costs' clause: the leadership page gives her the fleet and the planning team, and puts IT under a different name.",
         "role_status": "confirmed",
-        "role_source_url": "https://ostvale.example.com/news/rotterdam-dc"
+        "role_source_url": "https://ostvale.example.com/news/rotterdam-dc",
+        "linkedin_url": "https://www.linkedin.com/in/priya-raman-example",
+        "corroborated_by": "https://ostvale.example.com/about/leadership"
       },
       {
         "recipient_id": "R-0002",
@@ -30,12 +31,13 @@
         "first_name": "Daan",
         "last_name": "Vermeer",
         "title": "Transport Planning Manager",
-        "profile_url": "https://ostvale.example.com/about/leadership",
-        "profile_source": "company leadership page",
+        "profile_source": "linkedin, corroborated on the company site",
         "confidence": "medium",
         "persona_match": "fallback",
         "why_right_contact": "Not on the declared title list. Included as a second contact because he runs the planners day to day, but he is a level below the buyer described in the persona.",
-        "role_status": "unconfirmed"
+        "role_status": "unconfirmed",
+        "linkedin_url": "https://www.linkedin.com/in/daan-vermeer-example",
+        "corroborated_by": "https://ostvale.example.com/about/leadership"
       }
     ],
     "signals": [

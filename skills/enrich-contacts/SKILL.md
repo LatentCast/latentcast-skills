@@ -87,8 +87,11 @@ One line per signal. What connects the event to what the seller does.
 
 ## Personalization copy, if asked
 
-Requires `sequence` in the outreach profile. One block per step, each with its own purpose: a
-first touch, a follow-up on a different angle, something useful with no ask, a warm break-up.
+Requires `sequence` in the outreach profile. **Ask how many emails they actually send** and what
+each step is for; do not assume. Four is a common shape and the example uses it, but a two-step
+sequence and a seven-step one are both normal and the copy has to know which it is writing for.
+
+One block per step, each with its own stated purpose.
 
 Rules that hold across all of them:
 

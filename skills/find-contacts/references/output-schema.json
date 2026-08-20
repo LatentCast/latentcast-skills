@@ -59,7 +59,7 @@
         "required": [
           "full_name",
           "title",
-          "profile_url",
+          "linkedin_url",
           "profile_source",
           "confidence",
           "persona_match",
@@ -82,13 +82,9 @@
           "title": {
             "type": "string"
           },
-          "profile_url": {
-            "type": "string",
-            "description": "A checkable public page showing this person in this role. A professional network profile, a company leadership page, a dated press release or a conference speaker page all qualify. Omit the person entirely if you cannot find one."
-          },
           "profile_source": {
             "type": "string",
-            "description": "What kind of page profile_url is, e.g. 'company leadership page'."
+            "description": "Where the role was actually confirmed: 'linkedin', or a company leadership page, dated press release or speaker page if you corroborated there."
           },
           "confidence": {
             "enum": [
@@ -132,6 +128,14 @@
           "flags": {
             "type": "string",
             "description": "Data caveats worth carrying forward."
+          },
+          "linkedin_url": {
+            "type": "string",
+            "description": "The person's LinkedIn profile. The primary identifier, and what downstream tools key on."
+          },
+          "corroborated_by": {
+            "type": "string",
+            "description": "A second page you actually fetched that shows them in the role. LinkedIn blocks automated fetches, so a profile found through a search index is a cached view, which is exactly what preserves a title after someone has left. Corroborate, or cap confidence at medium."
           }
         }
       }
