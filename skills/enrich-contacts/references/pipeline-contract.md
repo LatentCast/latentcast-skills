@@ -97,6 +97,31 @@ Everything above, folded into Template v6. See that skill's `references/canvas-v
 
 ---
 
+## What the customer already told you
+
+A supplied list is an input, not a blank form. Read every column of it before researching anything.
+
+**Use the customer's own fields first.** If the file carries a company, a domain or a title, that
+value is the starting point and research is corroboration. Spending a research task rediscovering
+a column that was already filled is waste, and quietly ignoring it is worse: a row can be reported
+unresolved while the source file named the employer all along.
+
+**A disagreement is an open item, never an overwrite.** When research and the supplied file name
+different employers, keep both and raise it. Both are often true at once, and the usual reason is
+mundane: consultants, contractors and freelancers work under one company's name on another
+company's stand. Picking silently destroys the more interesting of the two facts.
+
+**A supplied list has already been qualified.** The customer decided who is worth contacting.
+Where that decision has been made, the job is to enrich the rows, not to re-score them: no fit
+judgements, no relevance verdicts, no recommendation to drop anyone. Report what is true about
+each contact and let the customer keep the targeting decision they already made.
+
+This survives into the record. `named_by_customer: yes` says where the row came from, and the
+verification owed is lower because the customer is a better source about their own prospects than
+a search index is.
+
+---
+
 ## Open items — a first-class output, not a footnote
 
 Every stage can raise one. They are the consolidated "needs a human before you send" list, and in

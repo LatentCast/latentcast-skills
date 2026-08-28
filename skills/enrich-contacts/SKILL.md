@@ -125,6 +125,16 @@ python3 ../find-contacts/scripts/build_workbook.py records.json enriched.xlsx --
 Four sheets: Companies, Contacts, Signals, Open items. The CSV is a lossy export for spreadsheet
 work.
 
+**Check your own links before you hand it over.** A source that does not open is an assertion, not
+a sourced fact, and clipped URLs are invisible to anything that only reads the records:
+
+```bash
+python3 ../find-contacts/scripts/validate_sources.py records.json
+```
+
+It catches truncated links, search results pages, and per-seat links that resolve only for the
+account that exported them.
+
 ## Quality rules
 
 Shared with `find-contacts`, in [`references/quality-rules.md`](references/quality-rules.md). The

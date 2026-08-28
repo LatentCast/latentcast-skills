@@ -77,6 +77,31 @@ Providers throttle. `options.batch_size` of 5 to 10 concurrent research tasks is
 comfortable. On a rate limit, back off and reduce concurrency. If it persists across the whole
 batch, stop and report rather than hammering the endpoint.
 
+## When the list arrives with links that do not open
+
+A contact list exported from a sales-prospecting seat usually carries per-seat identifiers rather
+than public profile URLs. They look like ordinary links, they are not.
+
+- They resolve **only for an account holding that subscription**. For anyone else, including the
+  customer who commissioned the work, they redirect to a sign-in or an upsell page.
+- The identifier in them is opaque. It cannot be converted into a public profile URL.
+- An export like this often arrives with the company column empty, because the seat holds that
+  data rather than the file.
+
+**Check one before planning around them.** Fetch a single link and look at what comes back. A
+sign-in page or a pricing page means every one of them is unusable, and it is better to know that
+in the first minute than after building a pipeline that assumes otherwise.
+
+**Resolve the person instead of the link.** Name plus title plus a specific city, through an
+entity-typed index, gets you a public profile you can cite. That is the URL the record wants
+anyway, because `linkedin_url` has to be a page a reviewer can open.
+
+**Do not automate a logged-in browser across the whole list to work around it.** The terms
+question aside, it does not work: these sites detect it, and the failures look like missing people
+rather than blocked requests, which corrupts the list quietly. Opening a handful of pages by hand
+to settle specific questions is ordinary use of an account. Driving hundreds of them is not, and
+the results get worse rather than better.
+
 ## A note on professional networks
 
 Profile URLs come from search-index results and public pages. This skill does not crawl any

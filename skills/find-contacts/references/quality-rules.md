@@ -25,12 +25,53 @@ So for every person:
 - **A headline is a claim, not a fact.** People update titles late and leave them stale for
   years. Prefer the experience entry with dates, the company's own staff page, or a dated
   mention.
+- **The summary blurb is prose; the experience entry is a record.** A profile's free-text "about"
+  section is written once and rarely revisited, so it routinely names a client or employer the
+  person left years ago. The dated experience entry beside it is structured and maintained. An
+  automated read that takes the first company name it sees will take the wrong one. Where the blurb names a former client and the
+  dated entry names the actual employer, only the second is right.
+- **A role listed as current can still carry an end date.** Read it. An entry whose date range has already
+  closed is a past role even when it sits at the top of the list, and even when a cached index
+  still reports it as present. Compare the end date against today before writing
+  `role_status: confirmed`.
 - **When the headline and the detail disagree, do not pick.** Set `role_status: conflicting`,
   say which said what, and let a human resolve it. One run correctly refused a candidate whose
   headline said Director while her own experience said Operations Manager for the current period.
 - **A departure is a finding worth reporting.** If the person you wanted has left, say so and name
   the gap. "No current international patient lead could be verified, recommend a manual check of
   who replaced X" is more useful than a confident wrong name, and it is what stops the send.
+
+## 0a. The right person, not merely a real person
+
+Section 0 catches the person who has left. This one catches the person who was never yours.
+
+**A name is not an identifier.** Common names collide, and the collision is invisible unless you
+look for it. Picture a contact list carrying a channel director in one town, where the strongest search
+result is a different person of exactly the same name, in the same country, in a senior sales role
+at a large firm. Every part of that match looks convincing. It is the wrong person.
+
+So before accepting a match, require **two discriminators that agree**, and know which ones are
+worthless:
+
+| Discriminator | Worth |
+|---|---|
+| Country, or a whole region | **None.** Two different people in the same country match on it |
+| A named city, town or metropolitan area | Good |
+| Two or more distinctive words from the job title | Good |
+| Employer stated on the page | Strong |
+| A third party naming the person *and* the employer together | Strongest |
+
+A country matching a country is not evidence. A named metropolitan area matching the same named
+metropolitan area is.
+
+**When two candidates score alike, pick neither.** A near-tie is the signature of a name
+collision, and choosing the higher score is how a confident wrong answer gets made. Return the
+row unresolved and say two candidates matched. The shape to watch for: one person publishes no employer at all while a namesake in a
+neighbouring city publishes one prominently. Name-only matching then files the wrong employer
+under the right person, and nothing downstream catches it.
+
+**A shortlist is a finding.** `status: needs-review, two candidates matched` costs a human thirty
+seconds. A wrong employer costs a send.
 
 ## 1. One verified person beats three guesses
 
@@ -76,6 +117,35 @@ A signal passes all four or it does not ship.
    a rollout. A funding round is not a valuation. "Named to a list" is not "won the award". A
    regional office is not an HQ move. "Serving 20,000 clients" is not "20,000 consultancies".
 
+## 2a. One name, several companies
+
+Gate 2 catches a same-named company in another country. This catches the harder case: the name is
+right and the company is still the wrong one.
+
+**Large groups are not one company.** A conglomerate's mobility, energy, healthcare and industrial
+businesses each have their own sales force, their own buyers and their own events. A signal that is
+true of the group is often meaningless to a contact inside one division. Someone selling rolling
+stock maintenance has no connection to a stand their group's security division took at a security
+show, and copy that implies otherwise reads as obviously automated.
+
+**Related legal entities share a name and are still distinct.** A register or exhibitor list may
+carry `Northwind Belgium` and `Northwind Enterprise BV` as separate lines because they *are*
+separate: a national sales entity, and a company that split from the same parent years ago. Neither
+is necessarily the business your contact works in. A list entry can match a contact's employer on the first
+word and on nothing else, with three different corporate entities conflated at once.
+
+So when a company name matches a register, a member list or an exhibitor list:
+
+- **Match on more than the leading word.** Confirm the division or entity, not just the brand.
+- **Record what matched.** A `flags` note reading "list entry is a name match only, entity
+  unconfirmed" is honest and takes seconds. Silence here reads as verification.
+- **Say which entity the signal is about.** "The group's Belgian sales entity exhibited" is a
+  different claim from "your team exhibited", and only one of them is defensible for a contact in
+  another division on another continent.
+
+An entity mismatch is not a reason to drop a contact. It is a reason to lead on a signal that is
+actually theirs.
+
 ## 3. Date every signal, and say how sure you are
 
 `date` is `YYYY-MM` at minimum, plus `date_confidence` of `exact`, `month` or `approximate`.
@@ -101,6 +171,31 @@ the case where you would rather have no signal than a stale one.
 Widen it when the segment genuinely runs on a longer cycle, an annual accreditation or a
 procurement round. Do not widen it because a run came back thin, because the thinness is the
 finding.
+
+## 3b. The source link has to open, and it has to be the one you read
+
+`source_url` is the whole audit trail. A signal whose link does not resolve is an assertion, not a
+sourced fact, and it fails gate 1 retroactively.
+
+Two ways this breaks, both silent:
+
+- **Truncation in transit.** URLs get shortened when they pass through a console, a preview pane,
+  a table or a summary before they reach the record. The result still looks like a URL and still
+  starts correctly, so nothing flags it. It is routine for most of a set to be clipped
+  this way with none of them opening. It was invisible to every check that read the records, and
+  obvious the moment something tried to fetch them. **Copy `source_url` verbatim from the tool
+  result, never from a rendered view of it.**
+- **One fact, two sources.** A fact assembled from two pages but citing one is unverifiable
+  against the page you named. If a booth number came from an announcement and a quote came from a
+  post, that is two signals with a source each, not one signal with the better-sounding link.
+
+**Fetch your own links before you ship them.** It is the cheapest check in the pipeline and it
+catches both faults. `scripts/validate_sources.py` in `find-contacts` does it in one pass.
+
+**A link behind a login is not a source.** Some exports carry per-seat identifiers that resolve
+only for the account that produced them. They look like ordinary URLs and they will not open for
+your customer, for a reviewer, or for you. Replace them with a public page or leave the field
+empty and say so.
 
 ## 4. Rank signals for what you sell
 

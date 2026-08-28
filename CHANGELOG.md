@@ -5,6 +5,40 @@ Versioning per [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [0.2.0] — unreleased
 
+### Added
+
+Hardening from a large run against a customer-supplied list. Every item below is a failure
+mode that produced a confidently wrong answer, or a defect that no check on the records
+could see.
+
+- **`quality-rules.md` §0a, the right person, not merely a real person.** Name collisions are
+  the dominant people-resolution failure and they are invisible unless looked for. Country-level
+  geography is worthless as a discriminator: two different people in the same country match on
+  it. A near-tie between two candidates is the signature of a collision, and picking the higher
+  score is how a wrong answer gets made — return the row unresolved instead.
+- **`quality-rules.md` §2a, one name and several companies.** Gate 2 catches a same-named company
+  abroad. It does not catch a conglomerate's divisions, or two related legal entities sharing a
+  brand, which is the case where the name is right and the company is still wrong. Match on more
+  than the leading word, record what matched, and say which entity a signal is about.
+- **`quality-rules.md` §3b, the source link has to open.** A clipped `source_url` still looks
+  like a URL and still starts correctly, so nothing that reads the records can see it. It is routine for most of a set to be shortened in transit with none of them opening.
+  Also: one fact assembled from two pages is two signals, not one with the better-sounding link.
+- **`scripts/validate_sources.py`.** Fetches every link in a record set and reports truncation,
+  search results pages, and per-seat links that resolve only for the account that exported them.
+  Standard library only; `--offline` runs the shape checks alone.
+- **Two additions to §0 on stale roles.** A profile's free-text summary is prose written once and
+  rarely revisited, while the experience entry beside it is dated and maintained — an automated
+  read that takes the first company name it sees takes the wrong one. And a role sitting at the
+  top of the list can still carry an end date; compare it against today before writing
+  `role_status: confirmed`.
+- **`pipeline-contract.md`, what the customer already told you.** Use the customer's own columns
+  before researching them, keep both values when research disagrees rather than overwriting, and
+  do not re-score a list the customer has already qualified.
+- **`providers.md`, when the list arrives with links that do not open.** Sales-prospecting
+  exports carry per-seat identifiers rather than public profile URLs. Check one before planning
+  around them, resolve the person rather than the link, and do not automate a logged-in browser
+  across the whole list to work around it.
+
 ### Changed
 
 Three skills instead of two, matching how the pipeline actually runs: find, enrich, then
