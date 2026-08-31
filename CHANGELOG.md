@@ -7,6 +7,16 @@ Versioning per [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **`build_canvas.py --omit-unused`.** Drops toggleable columns that are OFF and empty on every
+  row, and renumbers the rest so there are no gaps. An empty column reads as unfinished work and
+  a reader cannot tell "switched off deliberately" from "no data found". Identity (A-G), the rep
+  block (X-Z), anything set to `Deduct from Context` (blank because the platform fills it) and any
+  OFF-but-populated column are all left alone. Off by default, prints what it dropped, and the
+  docs say plainly that whether an ingest tolerates an absent header is a platform question this
+  repo cannot answer — the template is matched by header text rather than position, which is why
+  it can work at all.
+
+
 A second pass over the same 200-contact run, covering the canvas stage and a verification
 sweep that reopened every weakly-sourced employer.
 

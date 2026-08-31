@@ -268,19 +268,60 @@ def validate(rows, toggles, allow_blank_rep=False, allow_incomplete=False):
     return warnings
 
 
-def build(rows, out_path, toggles=None, allow_blank_rep=False, allow_incomplete=False):
+# Columns that must always ship: identity is required and not toggleable, and the rep block is
+# the casting key the platform bootstraps the cast from.
+NEVER_OMIT = set(range(1, 8)) | {24, 25, 26}
+
+
+def plan_columns(rows, tg, omit_unused=False):
+    """Return (columns, groups, toggles, omitted) renumbered with no gaps.
+
+    A column is dropped only when its toggle is literally OFF *and* every row is blank. A
+    "Deduct from Context" column is deliberately blank because the platform fills it, so it
+    stays. Header text is what the platform matches on, so the surviving headers are unchanged.
+    """
+    if not omit_unused:
+        return COLUMNS, GROUPS, tg, []
+    drop = set()
+    for col, _letter, _header, key, _dflt in COLUMNS:
+        if col in NEVER_OMIT or tg.get(col) != "OFF":
+            continue
+        if all(not str(r.get(key) or "").strip() for r in rows):
+            drop.add(col)
+    if not drop:
+        return COLUMNS, GROUPS, tg, []
+    keep = [c for c in COLUMNS if c[0] not in drop]
+    remap = {old[0]: new for new, old in enumerate(keep, start=1)}
+    columns = [(remap[c], letter, header, key, dflt) for c, letter, header, key, dflt in keep]
+    groups = []
+    for start, end, label in GROUPS:
+        cols = [remap[c] for c in range(start, end + 1) if c in remap]
+        if cols:
+            groups.append((min(cols), max(cols), label))
+    toggles = {remap[c]: v for c, v in tg.items() if c in remap}
+    omitted = [f"{letter} {header}" for c, letter, header, _k, _d in COLUMNS if c in drop]
+    return columns, groups, toggles, omitted
+
+
+def build(rows, out_path, toggles=None, allow_blank_rep=False, allow_incomplete=False,
+          omit_unused=False):
     """Write the canvas. Returns (row_count, warnings)."""
     tg = dict(TOGGLES)
     tg.update(normalise_toggles(toggles))
     warnings = validate(rows, tg, allow_blank_rep=allow_blank_rep,
                         allow_incomplete=allow_incomplete)
+    columns, groups, tg, omitted = plan_columns(rows, tg, omit_unused=omit_unused)
+    if omitted:
+        warnings.append("omitted " + str(len(omitted)) + " column(s), OFF and empty on every row: "
+                        + ", ".join(omitted) + ". Confirm your workspace accepts a canvas with "
+                        "fewer than 26 columns before relying on this.")
 
     wb = Workbook()
     wb.properties.creator = f"latentcast-skills/build_canvas.py {__version__}"
     ws = wb.active
     ws.title = "Personalization Canvas"
 
-    for start, end, label in GROUPS:
+    for start, end, label in groups:
         c = ws.cell(row=1, column=start, value=label)
         if end > start:
             ws.merge_cells(start_row=1, start_column=start, end_row=1, end_column=end)
@@ -288,7 +329,7 @@ def build(rows, out_path, toggles=None, allow_blank_rep=False, allow_incomplete=
         c.fill = PatternFill("solid", fgColor=GROUP_BG)
         c.alignment = Alignment(wrap_text=True, vertical="center")
 
-    for col, _letter, header, _key, _dflt in COLUMNS:
+    for col, _letter, header, _key, _dflt in columns:
         c = ws.cell(row=2, column=col, value=header)
         c.font = Font(bold=True, color="FFFFFF", size=10)
         c.fill = PatternFill("solid", fgColor=HEADER_BG)
@@ -306,7 +347,7 @@ def build(rows, out_path, toggles=None, allow_blank_rep=False, allow_incomplete=
     for i, row in enumerate(rows):
         r = 4 + i
         first = (row.get("full_name") or "").split(" ")[0] if row.get("full_name") else ""
-        for col, _letter, _header, key, dflt in COLUMNS:
+        for col, _letter, _header, key, dflt in columns:
             if key == "recipient_id":
                 v = row.get(key) or f"R-{i + 1:04d}"
             elif key == "personal_name":
@@ -321,9 +362,11 @@ def build(rows, out_path, toggles=None, allow_blank_rep=False, allow_incomplete=
             cell.alignment = wrap
         ws.row_dimensions[r].height = 92
 
-    widths = {1: 11, 2: 20, 3: 26, 4: 20, 5: 16, 6: 26, 7: 14, 8: 18, 9: 16, 10: 40,
-              11: 16, 12: 38, 13: 40, 14: 20, 15: 24, 16: 26, 17: 30, 18: 30, 19: 30,
-              20: 16, 21: 12, 22: 44, 23: 40, 24: 26, 25: 14, 26: 14}
+    base_widths = {"A": 11, "B": 20, "C": 26, "D": 20, "E": 16, "F": 26, "G": 14, "H": 18,
+                   "I": 16, "J": 40, "K": 16, "L": 38, "M": 40, "N": 20, "O": 24, "P": 26,
+                   "Q": 30, "R": 30, "S": 30, "T": 16, "U": 12, "V": 44, "W": 40, "X": 26,
+                   "Y": 14, "Z": 14}
+    widths = {col: base_widths[letter] for col, letter, _h, _k, _d in columns}
     for col, w in widths.items():
         ws.column_dimensions[get_column_letter(col)].width = w
     ws.row_dimensions[1].height = 26
@@ -333,7 +376,7 @@ def build(rows, out_path, toggles=None, allow_blank_rep=False, allow_incomplete=
     thin = Side(style="thin", color=GRID_LINE)
     border = Border(left=thin, right=thin, top=thin, bottom=thin)
     for r in range(1, 4 + len(rows)):
-        for col, *_ in COLUMNS:
+        for col, *_ in columns:
             ws.cell(row=r, column=col).border = border
 
     wb.save(out_path)
@@ -365,6 +408,11 @@ def main(argv=None):
                          "Column letters or 1-based indexes, columns H..Z only.")
     ap.add_argument("--allow-blank-rep", action="store_true",
                     help="permit rows with no rep. Renders a video with no sender.")
+    ap.add_argument("--omit-unused", action="store_true",
+                    help="drop toggleable columns that are OFF and empty on every row. Identity "
+                         "(A-G) and the rep block are never dropped. Headers are what the "
+                         "platform matches on, so surviving columns are unchanged — but confirm "
+                         "your workspace accepts fewer than 26 columns before relying on it.")
     ap.add_argument("--allow-incomplete", action="store_true",
                     help="permit blank identity columns A-G. Structural previews only; the "
                          "platform requires them.")
@@ -392,7 +440,8 @@ def main(argv=None):
         toggles = parse_toggle_arg(args.toggles)
         n, warnings = build(rows, args.out, toggles=toggles,
                             allow_blank_rep=args.allow_blank_rep,
-                            allow_incomplete=args.allow_incomplete)
+                            allow_incomplete=args.allow_incomplete,
+                            omit_unused=args.omit_unused)
     except CanvasValidationError as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 2

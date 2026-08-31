@@ -268,6 +268,32 @@ python scripts/build_canvas.py assets/rows.example.json canvas.xlsx \
 | `--allow-incomplete` | Permit blank identity columns A to G. Produces a canvas the platform will reject. |
 | `--strict` | Treat warnings as errors. For CI. |
 
+### Dropping columns you are not using
+
+An empty column reads as unfinished work, and a reader cannot tell "switched off deliberately"
+from "we had no data for this". `--omit-unused` removes any toggleable column that is **OFF and
+empty on every row**, and renumbers what remains so there are no gaps:
+
+```bash
+python3 scripts/build_canvas.py rows.json canvas.xlsx \
+  --toggles "P=OFF,Q=OFF,R=OFF,S=OFF,U=OFF,N=Deduct from Context" --omit-unused
+```
+
+What it will not touch:
+
+- **Identity, A to G.** Required and not toggleable.
+- **The rep block, X to Z.** Rep Email is the casting key the platform bootstraps the cast from.
+- **Anything set to `Deduct from Context`.** Those cells are blank *because the platform fills
+  them*. They are not missing data and removing them would remove the instruction.
+- **A column that is OFF but has values in it.** That combination is a contradiction the caller
+  should see, not something to silently delete.
+
+**Confirm your workspace accepts it before relying on it.** This template is matched by header
+text rather than by column position, which is why a shorter canvas can work at all — but whether
+the ingest tolerates a recognised header being *absent* is a platform question, not one this repo
+can answer. The builder prints exactly which columns it dropped, and the flag is off by default so
+nothing changes until you ask for it. Build one, upload it, and see.
+
 ### Rebuild in dependency order, every time
 
 The canvas is two derivations deep: research records feed the row set, and the row set feeds the

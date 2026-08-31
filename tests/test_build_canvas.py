@@ -290,3 +290,66 @@ def test_missing_file_exits_2(tmp_path):
         [sys.executable, str(SCRIPT), str(tmp_path / "nope.json"), str(tmp_path / "o.xlsx")],
         capture_output=True, text=True)
     assert result.returncode == 2
+
+
+# --- --omit-unused -----------------------------------------------------------------
+
+OFF_IMAGERY = "P=OFF,Q=OFF,R=OFF,S=OFF,U=OFF,N=Deduct from Context"
+
+
+def test_omit_unused_is_off_by_default(tmp_path):
+    """The default must stay a full 26-column canvas."""
+    wb, _w = build_to(tmp_path, [a_row()], toggles=bc.parse_toggle_arg(OFF_IMAGERY))
+    ws = wb["Personalization Canvas"]
+    assert ws.max_column == 26
+
+
+def test_omit_unused_drops_only_off_and_empty_columns(tmp_path):
+    wb, _w = build_to(tmp_path, [a_row()], toggles=bc.parse_toggle_arg(OFF_IMAGERY),
+                      omit_unused=True)
+    ws = wb["Personalization Canvas"]
+    headers = [ws.cell(row=2, column=i).value for i in range(1, ws.max_column + 1)]
+    for gone in ("Logo Image", "Opening Scene Image", "Context Scene Image",
+                 "Closing Scene Image", "Subtitles"):
+        assert gone not in headers, gone
+    # "Deduct from Context" is blank because the platform fills it, so it must survive
+    assert "Attire Color" in headers
+    assert ws.max_column == 21
+
+
+def test_omit_unused_never_drops_identity_or_rep(tmp_path):
+    """Even toggled OFF and empty, these must ship: A-G are required, X-Z are the casting key."""
+    every_off = ",".join(f"{c}=OFF" for c in "HIJKLMNOPQRSTUVWXYZ")
+    wb, _w = build_to(tmp_path, [a_row()], toggles=bc.parse_toggle_arg(every_off),
+                      omit_unused=True)
+    ws = wb["Personalization Canvas"]
+    headers = [ws.cell(row=2, column=i).value for i in range(1, ws.max_column + 1)]
+    for required in ("Recipient ID", "Full Name", "Email", "Title / Role", "Company",
+                     "Industry", "Country", "Rep Email", "Rep First Name", "Rep Last Name"):
+        assert required in headers, required
+
+
+def test_omit_unused_keeps_a_column_that_has_data(tmp_path):
+    """OFF but populated is a contradiction the caller should see, not something to delete."""
+    wb, _w = build_to(tmp_path, [a_row(logo_image="northwind-logo.png")],
+                      toggles=bc.parse_toggle_arg(OFF_IMAGERY), omit_unused=True)
+    ws = wb["Personalization Canvas"]
+    headers = [ws.cell(row=2, column=i).value for i in range(1, ws.max_column + 1)]
+    assert "Logo Image" in headers
+
+
+def test_omit_unused_renumbers_without_gaps(tmp_path):
+    wb, _w = build_to(tmp_path, [a_row()], toggles=bc.parse_toggle_arg(OFF_IMAGERY),
+                      omit_unused=True)
+    ws = wb["Personalization Canvas"]
+    for i in range(1, ws.max_column + 1):
+        assert ws.cell(row=2, column=i).value, f"gap at column {i}"
+    assert ws.cell(row=4, column=1).value  # data still starts at row 4
+
+
+def test_omit_unused_warns_about_what_it_dropped(tmp_path):
+    out = tmp_path / "c.xlsx"
+    _n, warnings = bc.build([a_row()], out, toggles=bc.parse_toggle_arg(OFF_IMAGERY),
+                            omit_unused=True)
+    assert any("omitted 5 column(s)" in w for w in warnings)
+    assert any("fewer than 26 columns" in w for w in warnings)
