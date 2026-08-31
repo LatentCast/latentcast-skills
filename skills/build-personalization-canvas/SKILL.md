@@ -268,6 +268,32 @@ python scripts/build_canvas.py assets/rows.example.json canvas.xlsx \
 | `--allow-incomplete` | Permit blank identity columns A to G. Produces a canvas the platform will reject. |
 | `--strict` | Treat warnings as errors. For CI. |
 
+### Rebuild in dependency order, every time
+
+The canvas is two derivations deep: research records feed the row set, and the row set feeds the
+workbook. Rebuild them out of order and the canvas is silently built from the previous version of
+the research.
+
+```
+records  ->  rows.json  ->  canvas.xlsx
+```
+
+This fails quietly. Nothing errors, the row count is right, and a corrected employer simply does
+not appear. In one run a contact's company had been fixed in the research and the canvas still
+carried the old one, because the row set had been regenerated first. It was found by reading the
+finished file, not by anything in the build.
+
+- **Script the whole chain** rather than running the steps by hand, so the order cannot drift.
+- **Point every output at one directory.** A build script that still writes to a path you moved
+  files out of will leave a stale copy exactly where someone will pick it up.
+- **Check the finished workbook, not the inputs.** Read a few cells back out of the `.xlsx` and
+  compare them to what you expect. Every derivation bug in a run of this shape was caught that way,
+  and none were caught by inspecting the JSON.
+
+The same applies to anything written *about* the canvas. A covering note quoting row counts and
+company totals goes stale the moment the workbook is rebuilt, so re-read the figures from the file
+before sending rather than from the last thing you remember them being.
+
 ## Running a hundred recipients
 
 A hundred recipients is a hundred model calls. It costs real money and takes real time. Batches

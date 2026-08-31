@@ -106,6 +106,13 @@ value is the starting point and research is corroboration. Spending a research t
 a column that was already filled is waste, and quietly ignoring it is worse: a row can be reported
 unresolved while the source file named the employer all along.
 
+**Read the free-text fields too, not just the obvious columns.** An employer is often sitting in a
+job-title string: `Strategic Account Executive - Benelux @ Northwind`. A pipeline that only reads a
+`company` column will miss it and then spend a research task rediscovering it, or worse, resolve to
+a different company and never notice the contradiction sitting in its own input. Scan title and
+description fields for `@ X`, `X - role` and `role at X` before researching, and treat what you find
+as a claim to check rather than an answer to accept.
+
 **A disagreement is an open item, never an overwrite.** When research and the supplied file name
 different employers, keep both and raise it. Both are often true at once, and the usual reason is
 mundane: consultants, contractors and freelancers work under one company's name on another
@@ -119,6 +126,27 @@ each contact and let the customer keep the targeting decision they already made.
 This survives into the record. `named_by_customer: yes` says where the row came from, and the
 verification owed is lower because the customer is a better source about their own prospects than
 a search index is.
+
+## Dropping a row needs one reason, not a bundle
+
+Late in a run there is pressure to hold back anything that looks unfinished. Resist combining
+tests: each exclusion rule should answer exactly one question, and only one question actually
+justifies removing someone.
+
+- **"Is this the right person?"** A profile that resolves to somebody else is a reason to exclude.
+  Sending correct copy to the wrong individual is the worst outcome available.
+- **"Will this link open for everyone?"** is a *different* question, and usually not a reason to
+  exclude anything. A seat-gated link is unusable for a stranger and perfectly usable for the
+  customer who owns the seat the list came from. Flag it; do not drop it.
+
+In one run those two tests were merged into a single rule and three contacts were removed whose
+only fault was having no public profile — including two whose employer the customer had supplied
+by hand. The justification written next to them, that the link could not be a delivery address,
+was simply false for the person receiving the file.
+
+**Write the reason per row before deciding.** If two rows are excluded for genuinely different
+reasons, they need different reasons recorded, and the moment you write them out it becomes obvious
+which one does not hold.
 
 ---
 

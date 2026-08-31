@@ -104,6 +104,63 @@ So when the only evidence is an index you cannot open:
 - **Never report an unopened cached profile as high confidence.** It is the same claim as
   "verified" and it is not the same thing.
 
+## 1a. Where the employer came from decides how much to trust it
+
+`company` is the field everything downstream hangs on: the signals attach to it, the angle argues
+from it, and the video says it out loud. But "we found an employer" covers evidence of wildly
+different strength, and the record does not distinguish them unless you make it.
+
+Ranked, strongest first:
+
+| How the employer was established | Trust |
+|---|---|
+| The profile's own current-role field, read on the page | **Highest.** It is the person's own maintained record |
+| The customer supplied it | **High.** They know their own prospects better than an index does |
+| Their own dated announcement, "I joined X" | High |
+| A third party naming the person *and* the employer in one sentence | Good |
+| A company name appearing somewhere in a post that mentions them | **Weak.** The post may be about a partner, a customer, or an event |
+| A company name parsed out of a headline string | **Weak.** Headlines carry former employers, aspirations and partner names |
+
+The bottom two rows are where the errors live. In one pass, every employer established from a post
+or a headline was reopened on the live profile: **six of seventy-nine were wrong**, and each named
+a real, plausible company that simply was not the person's employer. Every one had looked
+perfectly reasonable in the record.
+
+So:
+
+- **Record how you know, not just what you know.** A `profile_source` that says "employer named
+  alongside them in a post" is a different claim from "read from their current role", and only one
+  of them should ever carry `confidence: high`.
+- **If the campaign turns on the company being right, reopen the weak ones.** It is the cheapest
+  quality gain available: a fixed, countable set of rows, and a measurable error rate.
+- **Do not verify what is already strong.** Rows read from the profile's current-role field are
+  the strongest thing a cache can hold. Reopening those is where the effort stops paying.
+
+## 1b. Reopening a profile, without introducing new errors
+
+Opening the page is the fix for a cached employer. It has its own failure modes, and two of them
+produce a confident wrong answer rather than an obvious error.
+
+- **Check the name on the page you are reading.** Automated readers can return the *previous*
+  page's content when a navigation has not settled, and the result looks entirely normal: a real
+  name, a real company, correctly formatted. The only tell is that the name belongs to the person
+  you looked at a moment ago. So ask for the member's own name alongside the company every time,
+  and treat a name that does not match the row as a failed read rather than a finding. In one run
+  this caught a result that had silently carried over from the previous profile.
+- **A link that does not resolve is a finding, not a blank.** Profiles are deleted and renamed.
+  If the page returns "this page doesn't exist", record that: the person may still be real and the
+  employer may still be right, but the URL cannot be used as a delivery address or as evidence.
+- **Normalise regional hosts.** `xx.linkedin.com` and `www.linkedin.com` serve the same profile,
+  but tooling and allowlists frequently accept only one. Rewrite to the canonical host on the way
+  in, or a fraction of your rows will fail for reasons that have nothing to do with the data.
+- **The headline is not the company field.** Many profiles show a headline and no employer at all.
+  That is not a missing person, it is a person who has not filled that field in. Read the dated
+  experience entry instead of concluding the row is unresolvable.
+
+**Do this at human scale, on pages you are entitled to see.** Reopening a bounded set to settle
+specific questions is ordinary use of an account. Driving a whole list through a logged-in browser
+is not, and [`providers.md`](providers.md) explains why it also makes the data worse.
+
 ## 2. The four signal gates
 
 A signal passes all four or it does not ship.

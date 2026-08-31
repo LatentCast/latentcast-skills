@@ -7,6 +7,40 @@ Versioning per [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+A second pass over the same 200-contact run, covering the canvas stage and a verification
+sweep that reopened every weakly-sourced employer.
+
+- **`quality-rules.md` §1a, where the employer came from decides how much to trust it.** Ranks
+  the ways `company` gets established, strongest to weakest, and names the bottom two as where
+  the errors live: a company name lifted from a post that merely mentions the person, and one
+  parsed from a headline string. Reopening every row established that way, **six of seventy-nine
+  were wrong**, each naming a real and plausible company that was not the person's employer.
+- **`quality-rules.md` §1b, reopening a profile without introducing new errors.** An automated
+  read can return the *previous* page when navigation has not settled, and the result looks
+  entirely normal — ask for the member's own name alongside the company so a carried-over read is
+  detectable. Also: a dead profile URL is a finding rather than a blank, regional hosts need
+  normalising, and a profile showing only a headline is a person who left the field empty, not an
+  unresolvable row.
+- **`pipeline-contract.md`, read the customer's free-text fields.** An employer is frequently
+  sitting in a job-title string as `role @ Company`. A pipeline that reads only a `company` column
+  misses it, then either pays a research task to rediscover it or resolves to something else and
+  never notices the contradiction in its own input.
+- **`pipeline-contract.md`, dropping a row needs one reason, not a bundle.** "Is this the right
+  person" justifies exclusion. "Will this link open for everyone" usually does not — a seat-gated
+  link is unusable for a stranger and fine for the customer who owns the seat. Merging the two
+  tests removed three contacts whose only fault was having no public profile.
+- **`canvas-v6.md`, column C when the campaign is not delivered by email.** The column is named
+  Email; what it holds is how the recipient is reached. For a campaign going out over a
+  professional network that is the profile URL, which the builder accepts — but it is a departure
+  from the template's naming, the link has to open for whoever will use it, and a wrong address
+  produces a correct video delivered to a stranger.
+- **`build-personalization-canvas/SKILL.md`, rebuild in dependency order.** Records feed the row
+  set and the row set feeds the workbook. Out of order, the canvas is built from the previous
+  version of the research and nothing errors: the row count is right and a corrected employer
+  simply does not appear. Check the finished `.xlsx`, not the inputs — every derivation bug in
+  this run was caught by reading cells back out of the file.
+
+
 Hardening from a large run against a customer-supplied list. Every item below is a failure
 mode that produced a confidently wrong answer, or a defect that no check on the records
 could see.

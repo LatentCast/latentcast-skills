@@ -78,6 +78,27 @@ The template ships with every dimension `ON`. Turning one off is a campaign deci
 > `find-contacts` deliberately produces no email addresses. Fill column C from your CRM, or
 > resolve the addresses with a verified-email provider, before building a canvas.
 
+#### Column C when the campaign is not delivered by email
+
+The column is named Email because that is the usual delivery address. What it actually holds is
+**how this recipient is reached**, and it is required because a row the platform cannot deliver
+is not a row.
+
+For a campaign that goes out over a professional network rather than by email, the reachable
+address is the recipient's profile URL, and that is what belongs in C. The builder does not
+validate the format, so this works — but it is a deliberate departure from the template's own
+naming, and two things follow from it:
+
+- **Confirm it with whoever owns the sending side** before building a hundred rows on the
+  assumption. What the platform does with column C downstream is a platform question.
+- **The link has to open for the person who will use it.** A profile URL that resolves only for
+  the seat that exported it is not a delivery address for anyone else. A public profile is. See
+  [`providers.md`](../../find-contacts/references/providers.md) on seat-gated identifiers.
+
+Whatever goes in C, it must identify **this** recipient. A wrong address here does not produce a
+blank video, it produces a correct video delivered to a stranger, which is the most expensive
+failure the pipeline can have.
+
 ### Scene 1, Personal Introduction (H to K)
 
 Personal Name and Company Name also feed the Scene 3 outro.
