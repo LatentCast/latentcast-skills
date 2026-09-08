@@ -75,8 +75,24 @@ Capping at three columns loses the fourth. Keep them long and flatten only on ex
 | `fact` | What happened, one sentence, as the source states it |
 | `date`, `date_confidence` | `YYYY-MM` minimum. `exact` / `month` / `approximate` |
 | `type` | From the profile's signal ladder |
+| `type` | From the profile's signal ladder. Two reserved values, `direction` and `stack & market`, mark durable background rows rather than events; see below |
 | `source_url` | The page that states it. Never a search results page |
 | `angle` | **Core output.** One line: how this seller's offer connects to this event. Research, not copy. No booking link, no call to action |
+
+### Direction, and stack and market — two reserved types
+
+Events feed the canvas Triggering Event (J). Two more kinds of row feed the other two scene
+cells, and the canvas stage writes those cells from nothing else:
+
+| `type` | Holds | Feeds canvas |
+|---|---|---|
+| `direction` | Stated goals, growth direction, public commitments, in the organisation's own words | L, Strategic Priorities |
+| `stack & market` | Platforms, hosting model, named vendors, AI use, compliance regime, who they sell to, scale | M, Relevance Signals |
+
+Same columns as an event row, same four gates, same `source_url` rule. The difference is that the
+recency window does not apply: direction is durable, so an older plan that still runs is a
+correct answer, and the `date` column is what tells the reader how old it is. Never use one as
+the triggering event.
 
 ### Personalization copy — optional
 

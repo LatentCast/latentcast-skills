@@ -9,7 +9,7 @@ You declare who you are and what you sell. Nothing here assumes you sell what we
 | Skill | You have | You get |
 |-------|----------|---------|
 | [`find-contacts`](skills/find-contacts/) | A segment, or a list of companies | Companies sourced from real registers, scored on fit and campaign relevance, routed, then the right people at each backed by a page you can open |
-| [`enrich-contacts`](skills/enrich-contacts/) | Contacts | Dated, sourced signals, each with an opening angle. Optionally the personalization copy for your email sequence |
+| [`enrich-contacts`](skills/enrich-contacts/) | Contacts | Dated, sourced signals, each with an opening angle, plus each company's stated direction and its stack, sourced separately because the canvas needs both. Optionally the personalization copy for your email sequence |
 | [`build-personalization-canvas`](skills/build-personalization-canvas/) | All of it | A Personalization Canvas `.xlsx`, ready to render video from |
 
 Three stages, and **the review happens between them**. Sourcing is cheap and finding people is

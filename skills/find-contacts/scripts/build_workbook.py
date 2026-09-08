@@ -53,6 +53,7 @@ SHEETS = {
 
 HEADER_BG = "0D1218"
 ROUTING_FILL = {"white-glove": "E8F0E4", "cold-outreach": "F1F4F6", "drop": "F6ECEC"}
+TYPE_FILL = {"direction": "EEF3FA", "stack & market": "F4F1EA"}
 
 
 def clean(v):
@@ -107,11 +108,16 @@ def build(data, out_path):
                 cell = ws.cell(row=r, column=i, value=clean(row.get(name, "")))
                 cell.alignment = wrap
             # Routing is the decision the reader is scanning for. Tint the row.
+            fill = None
             if sheet_name == "Companies":
                 fill = ROUTING_FILL.get(str(row.get("routing", "")).lower())
-                if fill:
-                    for i in range(1, len(cols) + 1):
-                        ws.cell(row=r, column=i).fill = PatternFill("solid", fgColor=fill)
+            # Direction and stack rows are background, not events. Tint them so they read
+            # differently from the dated signals they sit between.
+            elif sheet_name == "Signals":
+                fill = TYPE_FILL.get(str(row.get("type", "")).lower())
+            if fill:
+                for i in range(1, len(cols) + 1):
+                    ws.cell(row=r, column=i).fill = PatternFill("solid", fgColor=fill)
         ws.freeze_panes = "A2"
         counts[sheet_name] = len(rows)
 
