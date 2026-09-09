@@ -353,3 +353,20 @@ def test_omit_unused_warns_about_what_it_dropped(tmp_path):
                             omit_unused=True)
     assert any("omitted 5 column(s)" in w for w in warnings)
     assert any("fewer than 26 columns" in w for w in warnings)
+
+
+# --------------------------------------------------------------- field loss
+
+def test_unrecognised_row_keys_are_warned_about_not_swallowed():
+    """The canvas renders 26 declared columns and nothing else, so a field the
+    enrichment filled in that the template does not name disappears between the signal
+    doc and the video. validate() is where that is caught - deliberately a warning that
+    --strict promotes, so the file still gets written and can be looked at."""
+    rows = [a_row(invented_field="x")]
+    warnings = bc.validate(rows, dict(bc.TOGGLES))
+    assert any("invented_field" in w for w in warnings)
+
+
+def test_every_template_key_passes_the_key_check():
+    warnings = bc.validate([a_row()], dict(bc.TOGGLES))
+    assert not any("unrecognised row keys" in w for w in warnings)

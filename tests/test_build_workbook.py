@@ -9,6 +9,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
 from openpyxl import load_workbook
 
 REPO = Path(__file__).resolve().parents[1]
@@ -114,3 +115,79 @@ def test_missing_file_exits_2(tmp_path):
     r = subprocess.run([sys.executable, str(SCRIPT), str(tmp_path / "no.json"),
                         str(tmp_path / "o.xlsx")], capture_output=True, text=True)
     assert r.returncode == 2
+
+
+# --------------------------------------------------------------- field loss
+
+def test_unwritten_fields_are_reported_not_swallowed():
+    """The defect this guard exists for. Three live runs lost a field this way - a
+    published email, a linkedin_url a person-anchored provider needed, and a resolved
+    employer flag - and every time the output looked complete."""
+    parts = bw.unpack([{
+        "company": "Ostvale", "domain": "ostvale.example.com",
+        "people": [{"recipient_id": "R-1", "full_name": "A One",
+                    "email": "a@ostvale.example.com", "invented_field": "x"}],
+        "signals": [{"fact": "f", "another_invention": "y"}],
+        "open_items": [],
+    }])
+    missing = bw.unwritten_fields(parts)
+    assert missing["Contacts"] == ["invented_field"]
+    assert missing["Signals"] == ["another_invention"]
+
+
+def test_structural_keys_are_not_reported_as_lost():
+    """people/signals/open_items become their own sheets. Reporting them as dropped
+    would be noise that trains the reader to ignore the warning."""
+    parts = bw.unpack([{"company": "Ostvale", "people": [], "signals": [],
+                        "open_items": []}])
+    assert bw.unwritten_fields(parts) == {}
+
+
+def test_declared_contract_fields_are_never_reported():
+    parts = bw.unpack([{
+        "company": "Ostvale", "domain": "d", "country": "NL", "industry": "Food",
+        "audience": "distributor", "segment": "distributor", "score": 5,
+        "people": [{"recipient_id": "R-1", "full_name": "A One", "title": "VP",
+                    "email": "a@b.c", "linkedin_url": "https://x", "flags": ""}],
+        "signals": [{"recipient_id": "R-1", "fact": "f", "date": "2026-05",
+                     "date_confidence": "month", "type": "expansion",
+                     "for_person": "ALL", "scope": "company-wide",
+                     "source_url": "https://x", "angle": "a"}],
+        "open_items": [{"item": "i", "affects": "x", "status": "open", "detail": "d"}],
+    }])
+    assert bw.unwritten_fields(parts) == {}
+
+
+def test_signals_sheet_carries_for_person_and_scope():
+    """Contract fields that never reach a column are the same bug in slower motion."""
+    declared = {n for n, _ in bw.SHEETS["Signals"]}
+    assert {"for_person", "scope"} <= declared
+
+
+def test_companies_sheet_carries_audience():
+    """audience is what the outreach profile matches sequence variants against. A
+    reviewer who cannot see it cannot tell why a given variant was chosen."""
+    assert "audience" in {n for n, _ in bw.SHEETS["Companies"]}
+
+
+def test_the_shipped_example_loses_nothing(tmp_path):
+    """Whatever ships as the worked example has to survive its own builder."""
+    data = json.loads((REPO / "examples" / "enriched.example.json").read_text())
+    assert bw.unwritten_fields(bw.unpack(data)) == {}
+
+
+def test_build_fails_loudly_on_an_unwritten_field(tmp_path, capsys):
+    data = [{"company": "Ostvale", "people": [{"recipient_id": "R-1", "surprise": "z"}],
+             "signals": [], "open_items": []}]
+    with pytest.raises(SystemExit) as exc:
+        bw.build(data, tmp_path / "out.xlsx", strict_fields=True)
+    assert exc.value.code == 2
+    assert "surprise" in capsys.readouterr().err
+
+
+def test_build_warns_but_proceeds_when_loss_is_allowed(tmp_path, capsys):
+    data = [{"company": "Ostvale", "people": [{"recipient_id": "R-1", "surprise": "z"}],
+             "signals": [], "open_items": []}]
+    counts = bw.build(data, tmp_path / "out.xlsx", strict_fields=False)
+    assert counts["Contacts"] == 1
+    assert "surprise" in capsys.readouterr().err

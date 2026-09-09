@@ -30,6 +30,7 @@ __version__ = "1.0.0"
 SHEETS = {
     "Companies": [
         ("company", 26), ("domain", 24), ("country", 14), ("hq", 18), ("segment", 18),
+        ("industry", 22), ("audience", 16),
         ("staff", 8), ("site_count", 10), ("company_fit", 11), ("campaign_relevance", 18),
         ("score", 7), ("routing", 15), ("fit_reason", 52), ("liveness", 20),
         ("evidence_url", 40), ("status", 10), ("notes", 52), ("researched_at", 13),
@@ -44,12 +45,39 @@ SHEETS = {
     ],
     "Signals": [
         ("recipient_id", 12), ("company", 26), ("fact", 62), ("date", 11),
-        ("date_confidence", 15), ("type", 16), ("source_url", 44), ("angle", 62),
+        ("date_confidence", 15), ("type", 16), ("for_person", 20), ("scope", 16),
+        ("source_url", 44), ("angle", 62),
     ],
     "Open items": [
         ("item", 44), ("affects", 26), ("status", 18), ("detail", 76),
     ],
 }
+
+# Keys that are structure, not data: unpack() turns them into their own sheets, so
+# they are not "lost" when the Companies sheet does not carry them.
+STRUCTURAL = {"people", "signals", "open_items", "records"}
+
+
+def unwritten_fields(parts):
+    """Fields present in the input that no sheet will write.
+
+    The workbook renders declared columns only, so a field the researcher filled in
+    and the contract did not declare disappears without a word. That has happened
+    three times on live runs - a published `email`, a `linkedin_url` needed by a
+    person-anchored provider, and a resolved-employer flag - and each time the
+    output looked complete. Silence is the whole defect, so this is never silent.
+    """
+    missing = {}
+    for key, sheet_name in SHEET_FOR.items():
+        declared = {name for name, _ in SHEETS[sheet_name]}
+        seen = set()
+        for row in parts[key]:
+            seen.update(row.keys())
+        extra = sorted(seen - declared - STRUCTURAL)
+        if extra:
+            missing[sheet_name] = extra
+    return missing
+
 
 HEADER_BG = "0D1218"
 ROUTING_FILL = {"white-glove": "E8F0E4", "cold-outreach": "F1F4F6", "drop": "F6ECEC"}
@@ -84,8 +112,17 @@ SHEETS_KEYS = ["companies", "contacts", "signals", "open_items"]
 SHEET_FOR = dict(zip(SHEETS_KEYS, SHEETS, strict=True))
 
 
-def build(data, out_path):
+def build(data, out_path, strict_fields=False):
     parts = unpack(data)
+    unwritten = unwritten_fields(parts)
+    if unwritten:
+        print("fields present in the input that no sheet writes:", file=sys.stderr)
+        for sheet_name, names in unwritten.items():
+            print(f"  {sheet_name}: {', '.join(names)}", file=sys.stderr)
+        print("  add them to SHEETS, or pass --allow-unwritten if the loss is intended.",
+              file=sys.stderr)
+        if strict_fields:
+            raise SystemExit(2)
     wb = Workbook()
     wb.remove(wb.active)
     wb.properties.creator = f"latentcast-skills/build_workbook.py {__version__}"
@@ -202,6 +239,8 @@ def main(argv=None):
     ap.add_argument("--csv", help="also write a flat CSV export")
     ap.add_argument("--today", default=dt.date.today().isoformat(),
                     help="date for the staleness audit. Defaults to today.")
+    ap.add_argument("--allow-unwritten", action="store_true",
+                    help="warn, do not fail, when the input carries fields no sheet writes")
     ap.add_argument("--version", action="version", version=f"build_workbook {__version__}")
     a = ap.parse_args(argv)
     try:
@@ -209,7 +248,7 @@ def main(argv=None):
     except (OSError, json.JSONDecodeError) as exc:
         print(f"error: cannot read {a.records}: {exc}", file=sys.stderr)
         return 2
-    counts = build(data, a.out)
+    counts = build(data, a.out, strict_fields=not a.allow_unwritten)
     print(f"wrote {a.out} — " + ", ".join(f"{v} {k.lower()}" for k, v in counts.items())
           + f" (build_workbook {__version__})")
     if a.csv:

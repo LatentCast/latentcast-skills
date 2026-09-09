@@ -56,3 +56,29 @@ the confirmation.
 [`../references/output-schema.json`](../references/output-schema.json), one per company **including
 the ones that failed**, so a company that returned nothing is distinguishable from one that was
 never run.
+
+## Fan out from an explicit manifest, never from the filesystem
+
+Whatever generates the per-company briefs must also write the list of what it wrote:
+
+```python
+json.dump(written, open("brief_manifest.json", "w"), indent=1)
+```
+
+Then launch only from that list.
+
+Inferring the current generation from file mtimes is unreliable the moment the
+generator has run more than once in a session — it silently unioned a buggy
+intermediate run back into the queue. And launching from names an agent believes exist
+is worse: three tasks on one run were dispatched against brief filenames that had never
+been written. The agents correctly refused, which is the only reason it was noticed.
+
+The manifest is also what makes the run auditable afterwards. Diff it against the
+outputs to see what never came back:
+
+```python
+missing = set(json.load(open("brief_manifest.json"))) - {p.stem for p in out.glob("*.json")}
+```
+
+On one run that diff was the only thing that surfaced a company nobody had launched.
+

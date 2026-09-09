@@ -55,6 +55,30 @@ Say what you understood and wait:
 
 Never refuse a number the user asked for. Price it and let them decide.
 
+**Price the tokens too, not just the task count.** Three things move per-company cost
+by roughly 3x with no measurable loss in what comes back, measured on a 150-company run:
+
+- **A tool-call budget in the brief.** State one — around 25 calls — and say what to do
+  on hitting it: write what you have and stop. Say plainly that a thin honest answer
+  beats an exhaustive one, and that a blocked source gets logged and abandoned, not
+  fought.
+- **A short brief.** The brief is re-sent on **every** turn of the agent loop, so every
+  word is paid for once per turn, not once per task. Cutting one from 2,100 to 600 words
+  is the cheapest large saving available, and nothing was lost: namesake rejections,
+  shortlist rejections and honest `thin`/`failed` statuses all held.
+- **The smaller model.** Where the accept and reject gates are written down, the gates
+  do the reasoning that a larger model would otherwise have to supply. Reserve the
+  larger one for work where the judgement is not yet expressible as a rule.
+
+Gate the expensive stages behind the cheap ones — see the waterfall below.
+
+**Waterfall the research, per person.** Cheapest source first, and stop the moment a
+person has what they need. Their own site, then a dated search, then the social profile
+without a browser, then registers and public records, then anything requiring a
+logged-in session. Do not start at the bottom because it is thorough; most people are
+answered in the first two steps, and the ones who are not are the only ones worth
+spending a session on.
+
 ## Signals
 
 Every signal passes all four gates or it does not ship.
@@ -169,6 +193,13 @@ two that matter most here:
   window is meant to do. Widen it for a genuinely longer cycle, never because a run came back thin.
 - **A fetch failure is not evidence of non-existence.** Run a known-good control through the same
   tool before concluding a source is fake.
+- **Absence from a team page is not evidence a person left.** The same rule, pointed at people.
+  Strike a row on affirmative evidence — a duplicate, a dissolved company, the wrong segment.
+  Flag it for a human when the person simply cannot be placed. Those are different findings and
+  collapsing them removes real contacts on no evidence.
+
+Joining two datasets is where consolidation actually fails, every time, and it has its own page:
+[`references/joining.md`](references/joining.md). Read it before writing a merge.
 
 ## What this is not
 
