@@ -72,6 +72,17 @@ states it, never a search results page.
 **Keep one row per signal.** Do not flatten to `signal1/2/3` — that caps you at three and loses
 the fourth silently. Flattening is an export concern.
 
+**Record who the source names, not just who the row is for.** `for_person` is the person the page
+actually names, or `ALL` when it names only the company. A firm's milestone is not something the
+recipient personally did, and once that distinction is lost it cannot be recovered downstream.
+
+**Stop per firm, not per person.** The obvious rule — stop researching a person the moment they
+have one signal — is wrong wherever the finding is company-wide, because one company fact then
+satisfies "one signal each" for every colleague at once. If the campaign needs a different signal
+per person, the target is **N distinct facts for N contacts at that firm**, and finding one
+company milestone for three people means keep looking, not move on. Say so in Open items when you
+cannot close the gap; it is unfixable later, because by assembly time the research is finished.
+
 **Rejecting a signal is a result.** Say which one and why. A run that returns no signal for a
 company is an honest answer, and roughly two-thirds of rows on a low-publishing segment will come
 back thin. That is the finding, not a failure.
@@ -134,6 +145,20 @@ python3 ../find-contacts/scripts/validate_sources.py records.json
 
 It catches truncated links, search results pages, and per-seat links that resolve only for the
 account that exported them.
+
+**Check what each contact actually got before calling the run finished.** A signal count is not
+coverage: it cannot tell you whether a fact is about the person or about their employer, and it
+hides firms that cannot fill their own people.
+
+```bash
+python3 scripts/check_signal_coverage.py records.json --csv coverage.csv
+```
+
+It reports every contact as `about them` / `company only` / `colleague only` / `nothing`, and every
+firm whose distinct facts fall short of its contacts. Add `--strict` to fail a build on a shortfall
+when the campaign needs a different signal per person. Report the breakdown, not the headline —
+"240 of 283 have signal" and "172 of 283 have a signal about them" are both true, and only the
+second one tells the customer what they are buying.
 
 ## Quality rules
 

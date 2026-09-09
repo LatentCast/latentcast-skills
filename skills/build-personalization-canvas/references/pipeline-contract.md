@@ -76,7 +76,29 @@ Capping at three columns loses the fourth. Keep them long and flatten only on ex
 | `date`, `date_confidence` | `YYYY-MM` minimum. `exact` / `month` / `approximate` |
 | `type` | From the profile's signal ladder |
 | `source_url` | The page that states it. Never a search results page |
+| `for_person` | The person the source actually **names**. `ALL` when the source names only the company |
+| `scope` | Derived: `person-specific` when `for_person` matches the recipient, `company-wide` otherwise |
 | `angle` | **Core output.** One line: how this seller's offer connects to this event. Research, not copy. No booking link, no call to action |
+
+### `recipient_id` is who it is for. `for_person` is who the source names
+
+They are not the same field and the difference is the whole point. A company milestone attached to
+three colleagues has three `recipient_id` values and `for_person: ALL` on all three. Without
+`scope`, an assembled row is indistinguishable from one where the source named that person, and
+the copy downstream will write a firm's achievement as something the recipient personally did.
+That is the fastest way to say something untrue to someone about their own work.
+
+### Fan-out: N contacts at a firm need N distinct facts
+
+**A company-wide fact counts once, not once per person.** If three people at a firm are on the
+list and research returns one company milestone, that firm has one fact for three recipients, not
+three. The shortfall belongs in Open items while the research is still running, because it cannot
+be fixed afterwards — by canvas time the searching is over.
+
+Whether the shortfall matters depends on the campaign, and the campaign has to say. One email
+sequence to three colleagues can reasonably share a company signal. Three personalised videos
+cannot: each recipient watches their own, so each needs something the others did not get. Read
+`sequence` and the campaign's own definition before deciding a shortfall is acceptable.
 
 ### Personalization copy — optional
 
