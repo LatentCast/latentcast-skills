@@ -179,8 +179,10 @@ which is where the script writer and the email sequence read from anyway.
 
 > Priya, the Rotterdam depot is where hand-built routes usually stop scaling.
 
-A URL in `cta_message` does not count against the limit, but the words around it do.
-Keep those under about 50 characters.
+A URL in `cta_message` does not count against the limit, and the same 120 applies to
+what is left. Where the viewing page renders the CTA as its own button, put no URL in
+the text at all - a trailing "here:" with nothing after it is what you get when the
+link was meant to be appended later and never was.
 
 ### Rep Data (X to Z) — who is on camera
 

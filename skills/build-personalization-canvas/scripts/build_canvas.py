@@ -234,7 +234,11 @@ def validate(rows, toggles, allow_blank_rep=False, allow_incomplete=False):
     # reads as a wall next to a video. A URL is exempt - it is rendered, not read.
     long_copy = {}
     for i, row in enumerate(rows):
-        for key, limit in (("welcome_message", 120), ("cta_message", 50)):
+        # 120 either way. An earlier 50-char cap on the CTA assumed a link shares the
+        # line; where the viewing page renders the CTA as a button the text stands
+        # alone, and the cap flagged 232 perfectly good one-line CTAs on its first
+        # real campaign. The constraint is line length, not word count.
+        for key, limit in (("welcome_message", 120), ("cta_message", 120)):
             text = str(row.get(key) or "")
             measured = URL_RE.sub("", text).strip()
             if len(measured) > limit:

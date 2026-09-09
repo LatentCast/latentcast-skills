@@ -407,11 +407,20 @@ def test_a_scheme_less_url_is_also_exempt():
 
 def test_wordy_cta_around_a_url_is_still_flagged():
     """The exemption is for the link, not for everything on the line with it."""
-    rows = [a_row(cta_message="Priya, I would really love to get some time in the diary "
-                              "with you before you finalise anything at all on this: "
+    rows = [a_row(cta_message="Priya, I would really love to get some time in the diary with "
+                              "you before you finalise anything at all on this project or "
+                              "indeed on any of the others we discussed at some length: "
                               "https://haldenbrook.example.com/book")]
     warnings = bc.validate(rows, dict(bc.TOGGLES))
     assert any("cta_message runs long" in w for w in warnings)
+
+
+def test_a_normal_one_line_cta_beside_a_button_is_not_flagged():
+    """Calibration fix. A 67-character CTA on a page whose button carries the link is
+    correct copy; the first cap flagged 232 of them on one campaign."""
+    rows = [a_row(cta_message="Priya, shall Barnaby bring samples before the depot opens?")]
+    warnings = bc.validate(rows, dict(bc.TOGGLES))
+    assert not any("cta_message runs long" in w for w in warnings)
 
 
 def test_the_length_warning_names_the_rows():
