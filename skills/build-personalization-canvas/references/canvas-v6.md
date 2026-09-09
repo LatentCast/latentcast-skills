@@ -165,6 +165,23 @@ Assign a rep who actually speaks the recipient's locale. All reps speak English;
 | `welcome_message` | V | ON / OFF / Deduct from Context | The short message welcoming the recipient alongside the video player |
 | `cta_message` | W | ON / OFF / Deduct from Context | The call to action shown alongside or after the video |
 
+**One line each. Around 80 characters, and 120 is the ceiling.**
+
+"Short" on its own is not a brief, and it does not hold. Two independent passes on the
+same campaign read it and wrote paragraphs of 230 and 300 characters, because the
+sentence that reads well in a document reads as a wall beside a video player. These are
+page furniture, not the message: the message is the video, and anything that wraps
+competes with it.
+
+Keep the recipient's first name and the one specific thing. Everything else you wanted
+to say belongs in `triggering_event`, `relevance_signals` and `relationship_context`,
+which is where the script writer and the email sequence read from anyway.
+
+> Priya, the Rotterdam depot is where hand-built routes usually stop scaling.
+
+A URL in `cta_message` does not count against the limit, but the words around it do.
+Keep those under about 50 characters.
+
 ### Rep Data (X to Z) — who is on camera
 
 | Key | Col | Meaning |

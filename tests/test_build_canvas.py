@@ -370,3 +370,52 @@ def test_unrecognised_row_keys_are_warned_about_not_swallowed():
 def test_every_template_key_passes_the_key_check():
     warnings = bc.validate([a_row()], dict(bc.TOGGLES))
     assert not any("unrecognised row keys" in w for w in warnings)
+
+
+# --------------------------------------------------------------- viewing-page length
+
+def test_long_welcome_message_is_flagged():
+    """"Short" without a number does not hold: two independent passes on one campaign
+    read it and wrote 230 and 300 characters."""
+    rows = [a_row(welcome_message="Priya, " + "a lovely long sentence about nothing " * 8)]
+    warnings = bc.validate(rows, dict(bc.TOGGLES))
+    assert any("welcome_message runs long" in w for w in warnings)
+
+
+def test_one_line_welcome_message_passes():
+    rows = [a_row(welcome_message="Priya, the Rotterdam depot is where hand-built routes "
+                                  "stop scaling.")]
+    warnings = bc.validate(rows, dict(bc.TOGGLES))
+    assert not any("runs long" in w for w in warnings)
+
+
+def test_a_url_does_not_count_against_the_cta_limit():
+    """The link is rendered, not read. Counting it would flag a four-word CTA."""
+    rows = [a_row(cta_message="Priya, 20 minutes before Germany goes live: "
+                              "https://haldenbrook.example.com/a/very/long/path/#Book")]
+    warnings = bc.validate(rows, dict(bc.TOGGLES))
+    assert not any("cta_message runs long" in w for w in warnings)
+
+
+def test_a_scheme_less_url_is_also_exempt():
+    """CTAs routinely carry a bare domain. Matching only https?:// counted the link as
+    prose and flagged a CTA that was four words long."""
+    rows = [a_row(cta_message="Priya, worth 20 minutes? cal.example.com/haldenbrook/20min")]
+    warnings = bc.validate(rows, dict(bc.TOGGLES))
+    assert not any("cta_message runs long" in w for w in warnings)
+
+
+def test_wordy_cta_around_a_url_is_still_flagged():
+    """The exemption is for the link, not for everything on the line with it."""
+    rows = [a_row(cta_message="Priya, I would really love to get some time in the diary "
+                              "with you before you finalise anything at all on this: "
+                              "https://haldenbrook.example.com/book")]
+    warnings = bc.validate(rows, dict(bc.TOGGLES))
+    assert any("cta_message runs long" in w for w in warnings)
+
+
+def test_the_length_warning_names_the_rows():
+    rows = [a_row(), a_row(welcome_message="x " * 100)]
+    warnings = bc.validate(rows, dict(bc.TOGGLES))
+    hit = [w for w in warnings if "welcome_message runs long" in w][0]
+    assert "rows 5" in hit

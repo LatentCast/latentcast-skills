@@ -133,6 +133,11 @@ class CanvasValidationError(Exception):
     """Raised when the rows cannot produce a usable canvas."""
 
 
+# Scheme-less links are normal in a CTA ("cal.example.com/20min"), so matching only
+# https?:// counts the link as prose and flags a CTA that is actually four words long.
+URL_RE = re.compile(r"https?://\S+|\S+\.[a-z]{2,}/\S*", re.I)
+
+
 def _clean(value):
     """Make a value safe and tidy for a spreadsheet cell.
 
@@ -222,6 +227,27 @@ def validate(rows, toggles, allow_blank_rep=False, allow_incomplete=False):
                 + ". Columns X, Y and Z are who is on camera, and Rep Email is the casting key. "
                   "A blank rep renders a video with no sender. Pass --allow-blank-rep for a "
                   "structural preview.")
+
+    # Viewing-page copy is page furniture beside the player, not the message. "Short"
+    # on its own does not hold: two independent passes on one campaign read it and
+    # wrote 230 and 300 characters, because the sentence that reads well in a document
+    # reads as a wall next to a video. A URL is exempt - it is rendered, not read.
+    long_copy = {}
+    for i, row in enumerate(rows):
+        for key, limit in (("welcome_message", 120), ("cta_message", 50)):
+            text = str(row.get(key) or "")
+            measured = URL_RE.sub("", text).strip()
+            if len(measured) > limit:
+                long_copy.setdefault(key, []).append((4 + i, len(measured)))
+    for key, hits in long_copy.items():
+        worst = max(n for _r, n in hits)
+        warnings.append(
+            f"{key} runs long on {len(hits)} row(s), worst {worst} characters"
+            f" (excluding any URL): rows " + ", ".join(str(r) for r, _n in hits[:8])
+            + (" ..." if len(hits) > 8 else "")
+            + ". One line each - it sits beside the player, and anything that wraps"
+              " competes with the video. Move the detail to Triggering Event or"
+              " Relevance Signals.")
 
     # An agent emitting ctaMessage instead of cta_message produces a canvas with every
     # narrative cell blank and no error at all. This is the check that catches it.
