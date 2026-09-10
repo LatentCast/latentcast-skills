@@ -29,6 +29,15 @@ from collections import defaultdict
 
 ALL = "ALL"
 
+# `direction` and `stack & market` feed the canvas scene cells L and M. They are not
+# triggering events and they are not what makes one recipient's video differ from a
+# colleague's, so counting them toward the fan-out target overstates coverage.
+NON_EVENT_TYPES = {"direction", "stack & market"}
+
+
+def is_event(signal):
+    return (signal.get("type") or "").strip().lower() not in NON_EVENT_TYPES
+
 LEGAL_NOISE = re.compile(
     r"\b(ltd|limited|llp|plc|inc|gmbh|bv|nv|sa|ab|as|oy|pty|"
     r"the|and|co|group|holdings)\b", re.I)
@@ -132,7 +141,7 @@ def coverage(records, touches=1):
             f["company"] = company
         f["people"].update(p.get("recipient_id") or p.get("full_name") for p in people)
         f["facts"].update((s.get("fact") or "").strip() for s in signals
-                          if (s.get("fact") or "").strip())
+                          if (s.get("fact") or "").strip() and is_event(s))
 
     firms, merged = [], []
     for f in pooled.values():

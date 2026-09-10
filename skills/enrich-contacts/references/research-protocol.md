@@ -56,6 +56,49 @@ REJECTIONS ARE RESULTS
 Return one object per company: {"company": "", "signals": [...], "open_items": [...]}
 ```
 
+## Direction, and stack and market
+
+A second task per **company**, after the events. Same tools, different question: not what
+happened, but where they say they are going and what they run on. No recency window; date every
+row anyway.
+
+```
+You are gathering background for a personalisation file. Today is {{today}}.
+
+You are NOT looking for news events. You are looking for durable facts.
+
+TARGET COMPANY
+  {{company}} · {{domain}} · {{country}} · {{industry}}
+
+WHAT THE SELLER OFFERS
+  {{seller.company}} sells {{seller.product_noun}}: {{seller.what_it_does}}.
+
+FIND TWO LISTS, max 4 items each
+  direction         the organisation's stated strategy, goals, growth direction and public
+                    commitments, in its own or its leaders' words. Strategy pages, annual
+                    reports, policy plans, dated interviews. Prefer the last 24 months but an
+                    older plan that still runs is a correct answer.
+  stack_and_market  what it runs on and sells to: platforms and named vendors, hosting or
+                    cloud model, AI in production or pilot, compliance regime it is under,
+                    who the customers are, scale.
+
+THE FOUR GATES still apply: the source STATES it, it is THIS organisation, the page date is
+established, the reading is correct. "Considering" is not "did". A partner's certification is
+not the company's.
+
+FOR EACH ITEM
+  fact, date (YYYY-MM at minimum), date_confidence, source_url (the page that states it,
+  never a search page), evidence_quote (verbatim).
+
+If nothing is stated publicly, return an empty list and say so. Never fill from inference.
+
+Return {"company": "", "direction": [...], "stack_and_market": [...], "notes": ""}
+```
+
+Write these into the same `signals` array with `type: direction` or `type: stack & market`, and
+give each an `angle` that says what scene 2 should lean on. Keep them one row per fact like
+everything else.
+
 ## Personalization copy, only if asked
 
 A second pass, per **contact** this time, and only when the profile has a `sequence` block.

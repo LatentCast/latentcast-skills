@@ -7,6 +7,18 @@ Versioning per [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **`enrich-contacts` sources direction and stack separately from events.** Two reserved signal
+  types, `direction` (stated goals, in the organisation's own words) and `stack & market`
+  (platforms, vendors, AI use, who they sell to), gathered in a second research task per company
+  with no recency window. They exist because `build-personalization-canvas` writes Strategic
+  Priorities (L) and Relevance Signals (M) only from the notes it is handed and invents nothing,
+  so an events-only file left those cells to be re-researched inside the canvas build. New
+  section in the skill, a second prompt in `research-protocol.md`, the contract updated in all
+  three copies, a pointer in the canvas skill, and `build_workbook.py` tints the two types on the
+  Signals sheet so they read as background rather than as events.
+
+### Added
+
 - **`build_canvas.py --omit-unused`.** Drops toggleable columns that are OFF and empty on every
   row, and renumbers the rest so there are no gaps. An empty column reads as unfinished work and
   a reader cannot tell "switched off deliberately" from "no data found". Identity (A-G), the rep

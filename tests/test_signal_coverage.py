@@ -425,3 +425,36 @@ def test_touches_below_one_is_rejected(tmp_path, monkeypatch):
     monkeypatch.setattr(sys, "argv", ["x", str(p), "--touches", "0"])
     with pytest.raises(SystemExit):
         csc.main()
+
+
+# --------------------------------------------------------------- reserved types
+
+def test_direction_and_stack_rows_do_not_count_toward_fan_out():
+    """They feed canvas L and M, not the triggering event. Counting them would say a
+    firm can fill three videos when it has one event and two context rows."""
+    records = [{
+        "company": "Ostvale",
+        "people": [person("R-1", "A One"), person("R-2", "B Two")],
+        "signals": [signal("A real event", for_person="A One"),
+                    signal("Stated goal to double the fleet", type="direction"),
+                    signal("Runs SAP and a bespoke WMS", type="stack & market")],
+    }]
+    _, firms, _ = csc.coverage(records)
+    assert firms[0]["distinct_facts"] == 1
+    assert firms[0]["shortfall"] == 1
+
+
+def test_is_event_is_case_and_space_tolerant():
+    assert not csc.is_event({"type": " Direction "})
+    assert not csc.is_event({"type": "STACK & MARKET"})
+    assert csc.is_event({"type": "project milestone"})
+    assert csc.is_event({})
+
+
+def test_reserved_types_still_count_as_coverage_for_the_person():
+    """Excluded from fan-out, but they are still signal about that person's firm and
+    the coverage verdict should say so."""
+    records = [{"company": "Ostvale", "people": [person("R-1", "A One")],
+                "signals": [signal("Stated goal", type="direction")]}]
+    contacts, _, _ = csc.coverage(records)
+    assert contacts[0]["verdict"] == "company only"

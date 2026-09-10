@@ -120,6 +120,46 @@ One line per signal. What connects the event to what the seller does.
 - **Never restate their strategy back to them.** They know what they do.
 - **No call to action, no link, no greeting.** That is copy, and it comes later if at all.
 
+## Two more kinds of row: direction, and stack and market
+
+Events are not enough for the canvas. `build-personalization-canvas` writes **Strategic
+Priorities (L)** and **Relevance Signals (M)** only from the research notes it is handed, and it
+is told to invent nothing. A signals file that carries only dated events leaves those two cells
+with nothing to draw on, and the canvas build ends up re-researching them under time pressure.
+
+So this skill produces two more kinds of row, one research task per company, after the events:
+
+| `type` | What it is | Feeds |
+|---|---|---|
+| `direction` | Where the organisation says it is going, in its own words: strategy pages, annual reports, policy plans, leader interviews. Goals, growth direction, public commitments. | L, Strategic Priorities |
+| `stack & market` | What it runs on and sells to: platforms, hosting model, named vendors, AI in production or pilot, compliance regime, who the customers are, scale. | M, Relevance Signals |
+
+**They are sourced differently from events.**
+
+- **Ask for durable facts, not news.** The prompt says so explicitly, or the same index hands
+  back the events you already have.
+- **The six-month window does not apply.** Direction is durable; a strategy plan from 2023 that
+  still runs to 2027 is the right answer. Date every row anyway and set `date_confidence`, so a
+  reader can see how old it is.
+- **Own words first.** A strategy page or an annual report beats a trade-press summary of it.
+  Leader interviews are good because they are dated and quoted.
+- **The four gates still hold.** The source states it, it is this organisation, the date is
+  established, the reading is correct. "Considering cloud for AI compute" is not "moved to cloud".
+- **Both kinds still get an `angle`.** For these it is a note on what scene 2 should lean on,
+  not a reason to reach out.
+
+Two to four rows of each per company is plenty. Every organisation should end up with both,
+including the ones that returned no event: a company with nothing to congratulate still has a
+direction and a stack, and that is what the video talks about instead.
+
+Say so before you spend it. Two research tasks per company, not one:
+
+> 24 companies. 24 event tasks in the six-month window, then 24 direction-and-stack tasks with
+> no window. Proceed?
+
+An open item should say that direction and stack rows are not events and must not be used as
+the triggering event. The workbook builder tints them so they read differently on the sheet.
+
 ## Personalization copy, if asked
 
 Requires `sequence` in the outreach profile. **Ask how many emails they actually send** and what

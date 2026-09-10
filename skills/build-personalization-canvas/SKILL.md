@@ -118,6 +118,14 @@ signals but each with its own copy.
 `recipient_id` and `company` are required. A missing `signals` array means the copy leads with
 the offer rather than inventing an event.
 
+**Strategic Priorities (L) and Relevance Signals (M) need their own rows.** The per-recipient
+prompt writes every cell from the research notes and invents nothing, so an input that carries
+only dated events has nothing for L and M. `enrich-contacts` produces two reserved signal types
+for exactly this: `direction` rows (stated goals, in their own words) feed L, and
+`stack & market` rows (platforms, vendors, AI use, who they sell to) feed M. If the input has
+neither, stop and run that pass upstream rather than researching inside the canvas build, where
+it is done in a hurry and never gets a source.
+
 **Two fields from upstream change what you write.** `routing` says whether this is a white-glove
 or a cold contact, and the register differs: a white-glove recipient has usually had human
 contact, so `relationship_context` should say so rather than reading "cold prospect". And
