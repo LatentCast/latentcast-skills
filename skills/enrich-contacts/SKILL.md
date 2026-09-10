@@ -128,6 +128,26 @@ sequence and a seven-step one are both normal and the copy has to know which it 
 
 One block per step, each with its own stated purpose.
 
+**The steps are different shapes, and writing them to one length wastes half of them.**
+A step that carries a video is short and defers to it - its whole job is to get the
+thing opened. A step with no video *is* the message and has to carry the argument
+itself, so it runs several times longer. Ask which steps carry what before writing any
+of them.
+
+**They are also not independent.** A break-up step that cannot name what the first step
+said reads as a sequence rather than a person, so it has to be written after step one
+and against it. Write them in order.
+
+**Quote the earlier step; do not re-derive it.** The reliable way for a later step to
+reference an earlier one is to quote that step's own sentence back verbatim. Pulling
+"the thing it was about" out of a hand-written sentence with a pattern produces
+grammatical rubbish - on a live run it generated *"I got in touch about Rockingham
+Street cleared Gateway 2"* - because no pattern can find a noun phrase. A complete
+sentence quoted whole is grammatical by construction. For the same reason, never
+lower-case a sentence's first character to make it read as a clause: it cannot know
+whether the first word is a proper noun, and *"clarke's Way"* is what you get when it
+is.
+
 Rules that hold across all of them:
 
 - **Congratulate the event. Do not describe their business.** The personalization is in what you

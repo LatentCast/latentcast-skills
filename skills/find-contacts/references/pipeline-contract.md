@@ -88,17 +88,30 @@ three colleagues has three `recipient_id` values and `for_person: ALL` on all th
 the copy downstream will write a firm's achievement as something the recipient personally did.
 That is the fastest way to say something untrue to someone about their own work.
 
-### Fan-out: N contacts at a firm need N distinct facts
+### Fan-out: the fact requirement multiplies on two axes
 
 **A company-wide fact counts once, not once per person.** If three people at a firm are on the
 list and research returns one company milestone, that firm has one fact for three recipients, not
 three. The shortfall belongs in Open items while the research is still running, because it cannot
 be fixed afterwards — by canvas time the searching is over.
 
+**The second axis is personalised touches, and it is the one people miss.** A campaign with two
+personalised videos needs two distinct facts *per person*, not one. Three colleagues in a
+two-video campaign need six facts between them. Check both axes at once:
+
+```bash
+python3 scripts/check_signal_coverage.py records.json --touches 2 --strict
+```
+
 Whether the shortfall matters depends on the campaign, and the campaign has to say. One email
 sequence to three colleagues can reasonably share a company signal. Three personalised videos
 cannot: each recipient watches their own, so each needs something the others did not get. Read
 `sequence` and the campaign's own definition before deciding a shortfall is acceptable.
+
+**Ask how many personalised touches there are before the research starts, not after.** On a live
+run the second video was scoped after the first was built; two thirds of recipients had a second
+fact and the rest had to re-frame the first one, which is a worse video than it needed to be. The
+number was knowable on day one.
 
 ### Personalization copy — optional
 

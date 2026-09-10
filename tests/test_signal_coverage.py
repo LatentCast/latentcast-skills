@@ -90,8 +90,8 @@ def test_company_signal_shared_by_three_is_one_fact_not_three():
     }]
     contacts, firms, _ = csc.coverage(records)
     assert [c["verdict"] for c in contacts] == ["company only"] * 3
-    assert firms[0] == {"company": "Ostvale", "contacts": 3,
-                        "distinct_facts": 1, "shortfall": 2}
+    assert firms[0] == {"company": "Ostvale", "contacts": 3, "touches": 1,
+                        "facts_needed": 3, "distinct_facts": 1, "shortfall": 2}
 
 
 def test_three_distinct_facts_for_three_people_is_no_shortfall():
@@ -345,3 +345,83 @@ def test_merged_firms_are_named_in_the_report(capsys):
     out = capsys.readouterr().out
     assert "pooled before scoring: 1" in out
     assert "Marrowby + Marrowby Limited" in out
+
+
+# --------------------------------------------------------------- touches
+
+def test_two_touches_double_what_a_firm_must_produce():
+    """The second axis. One fact each is enough for one video and not for two, and a
+    campaign that only checks the colleague axis finds out at assembly time - when the
+    research is over."""
+    records = [{
+        "company": "Ostvale",
+        "people": [person("R-1", "A One"), person("R-2", "B Two")],
+        "signals": [signal("Fact one", for_person="A One"),
+                    signal("Fact two", for_person="B Two")],
+    }]
+    _, one, _ = csc.coverage(records, touches=1)
+    _, two, _ = csc.coverage(records, touches=2)
+    assert one[0]["facts_needed"] == 2 and one[0]["shortfall"] == 0
+    assert two[0]["facts_needed"] == 4 and two[0]["shortfall"] == 2
+
+
+def test_touches_defaults_to_one_so_existing_callers_are_unchanged():
+    records = [{"company": "Ostvale", "people": [person("R-1", "A One")],
+                "signals": [signal("A fact", for_person="A One")]}]
+    _, firms, _ = csc.coverage(records)
+    assert firms[0]["touches"] == 1 and firms[0]["shortfall"] == 0
+
+
+def test_enough_facts_for_two_touches_is_no_shortfall():
+    records = [{
+        "company": "Ostvale",
+        "people": [person("R-1", "A One")],
+        "signals": [signal("Fact one", for_person="A One"),
+                    signal("Fact two", for_person="A One")],
+    }]
+    _, firms, _ = csc.coverage(records, touches=2)
+    assert firms[0]["shortfall"] == 0
+
+
+def test_the_shortfall_total_is_labelled_as_facts_not_people():
+    """With touches > 1 one person can account for several missing facts, so calling
+    the total 'contacts' overstates it."""
+    records = [{"company": "Ostvale", "people": [person("R-1", "A One")],
+                "signals": []}]
+    contacts, firms, merged = csc.coverage(records, touches=3)
+    import io
+    buf = io.StringIO()
+    csc.report(contacts, firms, merged, out=buf, touches=3)
+    assert "distinct facts still needed: 3" in buf.getvalue()
+
+
+def test_the_report_names_both_axes(capsys):
+    records = [{"company": "Ostvale",
+                "people": [person("R-1", "A One"), person("R-2", "B Two")],
+                "signals": [signal("Only fact")]}]
+    contacts, firms, merged = csc.coverage(records, touches=2)
+    csc.report(contacts, firms, merged, touches=2)
+    out = capsys.readouterr().out
+    assert "2 facts per contact" in out
+    assert "2 contacts x 2 touches = 4 needed / 1 found" in out
+
+
+def test_cli_touches_flag_changes_the_verdict(tmp_path, monkeypatch):
+    p = tmp_path / "records.json"
+    p.write_text(json.dumps([{
+        "company": "Ostvale",
+        "people": [person("R-1", "A One")],
+        "signals": [signal("A fact", for_person="A One")],
+    }]))
+    monkeypatch.setattr(sys, "argv", ["x", str(p), "--strict"])
+    assert csc.main() == 0
+    monkeypatch.setattr(sys, "argv", ["x", str(p), "--touches", "2", "--strict"])
+    assert csc.main() == 1
+
+
+def test_touches_below_one_is_rejected(tmp_path, monkeypatch):
+    p = tmp_path / "records.json"
+    p.write_text(json.dumps([{"company": "Ostvale", "people": [], "signals": []}]))
+    monkeypatch.setattr(sys, "argv", ["x", str(p), "--touches", "0"])
+    with pytest.raises(SystemExit):
+        csc.main()

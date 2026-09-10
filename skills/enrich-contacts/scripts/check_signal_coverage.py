@@ -7,13 +7,15 @@ Two questions this answers that a signal count cannot:
      recipient personally did is the fastest way to say something untrue to someone
      about their own work.
 
-  2. Does the firm have enough DISTINCT facts for the people on the list? If each
-     recipient gets their own video, three colleagues sharing one company milestone
-     is a shortfall. It has to surface while the research is still running, because
-     by assembly time the searching is over and it cannot be fixed.
+  2. Does the firm have enough DISTINCT facts? The requirement multiplies on two
+     axes - colleagues AND personalised touches. Three colleagues sharing one company
+     milestone is a shortfall; three colleagues in a two-video campaign need six
+     facts. Both have to surface while the research is still running, because by
+     assembly time the searching is over and neither can be fixed.
 
 Usage:
     python3 check_signal_coverage.py records.json
+    python3 check_signal_coverage.py records.json --touches 2  # two videos per person
     python3 check_signal_coverage.py records.json --strict     # exit 1 on a shortfall
     python3 check_signal_coverage.py records.json --csv cov.csv
 """
@@ -70,8 +72,14 @@ def signal_scope(signal, person):
     return "colleague"
 
 
-def coverage(records):
+def coverage(records, touches=1):
     """One row per contact, plus one row per firm for the fan-out check.
+
+    `touches` is how many personalised touches each recipient gets. The fact
+    requirement multiplies by BOTH axes: colleagues and touches. A three-person firm
+    in a two-video campaign needs six distinct facts, not three. Missing the second
+    axis is how a campaign discovers at assembly time that its second video has
+    nothing new to say - by which point the research is finished.
 
     Returns (contacts, firms, merged) - `merged` names any firms that arrived as more
     than one record. The contract asks for one record per company; when that is not
@@ -131,8 +139,10 @@ def coverage(records):
         firms.append({
             "company": f["company"],
             "contacts": len(f["people"]),
+            "touches": touches,
+            "facts_needed": len(f["people"]) * touches,
             "distinct_facts": len(f["facts"]),
-            "shortfall": max(0, len(f["people"]) - len(f["facts"])),
+            "shortfall": max(0, len(f["people"]) * touches - len(f["facts"])),
         })
         if len(f["names"]) > 1:
             merged.append(sorted(f["names"]))
@@ -140,7 +150,7 @@ def coverage(records):
     return contacts, firms, merged
 
 
-def report(contacts, firms, merged=(), out=None):
+def report(contacts, firms, merged=(), out=None, touches=1):
     # resolved at call time, not bound at import: a default of sys.stdout captures
     # whatever the stream was when this module was first imported, so anything that
     # redirects stdout later (a test harness, a caller teeing to a file) is bypassed
@@ -160,13 +170,18 @@ def report(contacts, firms, merged=(), out=None):
               file=out)
         for names in merged:
             print(f"    {' + '.join(n[:40] for n in names)}", file=out)
-    print(f"  short of one fact per contact: {len(short)}", file=out)
+    per = "one fact per contact" if touches == 1 else f"{touches} facts per contact"
+    print(f"  short of {per}: {len(short)}", file=out)
     if short:
+        # this is a count of MISSING FACTS, not of people. With touches > 1 one
+        # person can account for more than one of them, so calling it contacts
+        # overstates the damage.
         total = sum(f["shortfall"] for f in short)
-        print(f"  contacts with no fact of their own: {total}", file=out)
+        print(f"  distinct facts still needed: {total}", file=out)
         for f in sorted(short, key=lambda x: -x["shortfall"]):
-            print(f"    {f['company'][:52]:52s} "
-                  f"{f['contacts']} contacts / {f['distinct_facts']} facts "
+            print(f"    {f['company'][:48]:48s} "
+                  f"{f['contacts']} contacts x {f['touches']} touches "
+                  f"= {f['facts_needed']} needed / {f['distinct_facts']} found "
                   f"(short {f['shortfall']})", file=out)
     return short
 
@@ -176,15 +191,20 @@ def main():
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("records", help="records.json matching the pipeline contract")
     ap.add_argument("--csv", help="write the per-contact coverage rows here")
+    ap.add_argument("--touches", type=int, default=1,
+                    help="personalised touches per recipient. A two-video campaign is "
+                         "2, and doubles the distinct facts each firm has to produce.")
     ap.add_argument("--strict", action="store_true",
-                    help="exit 1 if any firm has fewer distinct facts than contacts")
+                    help="exit 1 if any firm has fewer distinct facts than it needs")
     a = ap.parse_args()
 
     records = json.load(open(a.records))
     if isinstance(records, dict):
         records = records.get("records") or records.get("companies") or []
-    contacts, firms, merged = coverage(records)
-    short = report(contacts, firms, merged)
+    if a.touches < 1:
+        raise SystemExit("--touches must be at least 1")
+    contacts, firms, merged = coverage(records, touches=a.touches)
+    short = report(contacts, firms, merged, touches=a.touches)
 
     if a.csv:
         with open(a.csv, "w", newline="") as fh:
