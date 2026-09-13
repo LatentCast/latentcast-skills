@@ -2,7 +2,9 @@
 name: enrich-contacts
 description: >-
   Find recent, dated, sourced signals for contacts you already have, and turn each one into an
-  opening angle: how your offer connects to what just happened at their company. Optionally
+  opening angle: how your offer connects to what just happened at their company. Covers the four
+  dimensions a LatentCast video personalizes along (triggering event, relationship context,
+  strategic intent, stack and market) and asks which ones the campaign wants. Optionally
   writes the personalization copy for each step of an email sequence. Takes the output of
   find-contacts unchanged. Use when you have people and need a reason to reach out, when a
   contact list has no talking points, or when asked to enrich contacts, find trigger events,
@@ -36,22 +38,68 @@ Neither is the canvas. `welcome_message` and `cta_message` are **viewing-page** 
 the video player, and they belong to `build-personalization-canvas`. Three surfaces, three
 registers. Do not reuse one for another.
 
+## Four dimensions, and the campaign chooses
+
+A LatentCast video personalizes its story along four dimensions. Each one is a canvas column with
+its own on/off switch, and this skill researches all four:
+
+| Dimension | What it says | Row `type` | Canvas |
+|---|---|---|---|
+| Triggering event | What just happened at their company. Why this video, why now | from the signal ladder | J, Triggering Event |
+| Relationship context | How the seller and the recipient are connected: prior contact, an existing account, a customer of the seller's who works beside them | `relationship` | K, Relationship Context |
+| Strategic intent | Where they say they are going: goals, growth direction, public commitments | `direction` | L, Strategic Priorities |
+| Stack and market | What they run on and who they sell to: platforms, vendors, AI use, customers, scale | `stack & market` | M, Relevance Signals |
+
+**Which ones a campaign uses is the customer's decision, not the agent's.** The agent cannot see
+the video. It does not know whether marketing wants a scene about the recipient's strategy or a
+short video that only mentions the event, and a sensible-looking guess from the brief is still a
+guess. When the guess is wrong, the campaign finds out at canvas time that a scene it wanted has
+nothing behind it, and by then the research is finished. So ask before any research starts (see
+below) and research exactly what comes back.
+
+**A dimension left out is a campaign decision, not missing data.** Record it in
+`research.dimensions` so the canvas switches that column OFF, rather than shipping blank cells that
+read as research that failed.
+
+**A dimension that was chosen is owed for every company.** At least one row each, or an honest
+"nothing stated publicly" in notes plus an open item. Customers switch a scene on and off to see
+what it adds; if a third of the companies have nothing for it, the comparison says more about the
+research than about the scene.
+
+Every row belongs to exactly one dimension and its `type` says which (the contract calls the
+derived value `dimension`), so a reader can see which scene a fact is able to feed.
+
 ## What you need
 
 - An agent that can search the web and fetch pages. Prefer an entity-typed index; see
   [`references/providers.md`](references/providers.md).
-- An outreach profile for the signal ladder and, if you want copy, the sequence and voice blocks.
+- An outreach profile for the signal ladder and the dimensions and, if you want copy, the sequence
+  and voice blocks.
 - Contacts. This skill does not find people.
+- For relationship context, whatever the customer already holds: CRM history, account notes, a
+  list of their existing customers. Most of it is not on the public web.
 
 ## Before spending anything
 
 **One research task per company, not per contact.** Two people at the same company share its
 signals, so researching per contact pays twice for the same answer. Group first, then fan out.
 
-Say what you understood and wait:
+**Ask which dimensions, with all four ticked.** Name them in plain words and let the user drop
+what the campaign will not use. Do not decide from the brief, however obvious it looks: the
+agent cannot see the video, and only the customer knows what its scenes are for.
 
-> 43 companies behind 62 contacts, so 43 research tasks. Signals from the last 6 months, ranked
-> expansion, funding, milestone. Copy for all four sequence steps as well. Proceed?
+> LatentCast personalizes the video along four dimensions: what just happened at their company,
+> how you are connected to them, where they say they are going, and what they run on and sell
+> to. I will research all four unless you want fewer. Drop any?
+
+Skip the question only when `research.dimensions` in the profile already answers it, and name the
+dimensions in the confirmation either way. Offer to save the answer to the profile.
+
+Then say what you understood, priced per dimension, and wait:
+
+> 43 companies behind 62 contacts. Events: 43 tasks in the last 6 months, ranked expansion,
+> funding, milestone. Strategy and stack: 43 more tasks, no window. Relationship: joined from the
+> CRM export you sent, no research tasks. Copy for all four sequence steps as well. Proceed?
 
 Never refuse a number the user asked for. Price it and let them decide.
 
@@ -120,14 +168,15 @@ One line per signal. What connects the event to what the seller does.
 - **Never restate their strategy back to them.** They know what they do.
 - **No call to action, no link, no greeting.** That is copy, and it comes later if at all.
 
-## Two more kinds of row: direction, and stack and market
+## Strategic intent, and stack and market (L and M)
 
-Events are not enough for the canvas. `build-personalization-canvas` writes **Strategic
+Events feed only the Triggering Event (J). `build-personalization-canvas` writes **Strategic
 Priorities (L)** and **Relevance Signals (M)** only from the research notes it is handed, and it
 is told to invent nothing. A signals file that carries only dated events leaves those two cells
 with nothing to draw on, and the canvas build ends up re-researching them under time pressure.
 
-So this skill produces two more kinds of row, one research task per company, after the events:
+So when the campaign chose either dimension, this skill produces two more kinds of row, one
+research task per company, after the events:
 
 | `type` | What it is | Feeds |
 |---|---|---|
@@ -148,17 +197,36 @@ So this skill produces two more kinds of row, one research task per company, aft
 - **Both kinds still get an `angle`.** For these it is a note on what scene 2 should lean on,
   not a reason to reach out.
 
-Two to four rows of each per company is plenty. Every organisation should end up with both,
-including the ones that returned no event: a company with nothing to congratulate still has a
-direction and a stack, and that is what the video talks about instead.
-
-Say so before you spend it. Two research tasks per company, not one:
-
-> 24 companies. 24 event tasks in the six-month window, then 24 direction-and-stack tasks with
-> no window. Proceed?
+Two to four rows of each per company is plenty. Every organisation should end up with at least
+one row for each dimension chosen, including the ones that returned no event: a company with
+nothing to congratulate still has a direction and a stack, and that is what the video talks about
+instead.
 
 An open item should say that direction and stack rows are not events and must not be used as
 the triggering event. The workbook builder tints them so they read differently on the sheet.
+
+## Relationship context (K)
+
+How the seller and this recipient are connected: a prior meeting, an existing account, a mutual
+connection, a customer of the seller's who works beside them. It is the hardest dimension to find
+on the public web, because most of it was never published, and the easiest to get wrong, because
+a claimed connection that is not real is worse than none. The recipient knows who they know.
+
+**Start from what the customer holds, not from a search.** CRM history, account notes, their list
+of existing customers, and every column of the file they sent. A lead file often carries it
+already, for example a column naming the existing customer in the same business park. That is
+data to join, not research to run. Those rows carry `supplied_by_customer: yes` in place of a
+`source_url`, and the `fact` names the file and column.
+
+**Research only against a list.** When the customer supplies their existing customers, it is a
+fair question which prospects work beside one: the same site, a case study naming both, the same
+cluster or association. Without such a list there is nothing specific to look for. The prompt is
+in [`references/research-protocol.md`](references/research-protocol.md).
+
+**Never promote a shared industry, city or trade show into a relationship.** "Cold prospect, no
+prior contact" is a correct answer and the default when nothing turns up. The exception is a
+white-glove contact, who has usually had human contact already: an empty result there is an open
+item, not "cold".
 
 ## Personalization copy, if asked
 

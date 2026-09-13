@@ -444,9 +444,25 @@ def test_direction_and_stack_rows_do_not_count_toward_fan_out():
     assert firms[0]["shortfall"] == 1
 
 
+def test_relationship_rows_do_not_count_toward_fan_out():
+    """They feed canvas K. A firm with one event and one customer relationship still
+    has one event to spread across its people, not two."""
+    records = [{
+        "company": "Ostvale",
+        "people": [person("R-1", "A One"), person("R-2", "B Two")],
+        "signals": [signal("A real event", for_person="A One"),
+                    signal("Customer since 2024, per the CRM export", type="relationship",
+                           source_url="", supplied_by_customer="yes")],
+    }]
+    _, firms, _ = csc.coverage(records)
+    assert firms[0]["distinct_facts"] == 1
+    assert firms[0]["shortfall"] == 1
+
+
 def test_is_event_is_case_and_space_tolerant():
     assert not csc.is_event({"type": " Direction "})
     assert not csc.is_event({"type": "STACK & MARKET"})
+    assert not csc.is_event({"type": "Relationship"})
     assert csc.is_event({"type": "project milestone"})
     assert csc.is_event({})
 

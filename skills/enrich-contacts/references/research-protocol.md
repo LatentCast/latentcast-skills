@@ -3,6 +3,14 @@
 One task per **company**, not per contact. Two people at the same company share its signals, so
 per-contact fanning pays twice for the same answer.
 
+Run only the passes for the dimensions the campaign chose, from `research.dimensions`:
+
+| Dimension | Pass | Cost |
+|---|---|---|
+| `triggering_event` (J) | The events prompt, below | One task per company |
+| `strategic_priorities` (L), `relevance_signals` (M) | The direction-and-stack prompt, asking only for the lists the campaign chose | One task per company, for either or both |
+| `relationship_context` (K) | A join against the customer's own records, then the reference prompt only if they supplied a list of their customers | Nothing for the join. One task per company for the prompt |
+
 ## The prompt
 
 ```
@@ -56,11 +64,12 @@ REJECTIONS ARE RESULTS
 Return one object per company: {"company": "", "signals": [...], "open_items": [...]}
 ```
 
-## Direction, and stack and market
+## Direction, and stack and market (L and M)
 
-A second task per **company**, after the events. Same tools, different question: not what
-happened, but where they say they are going and what they run on. No recency window; date every
-row anyway.
+A second task per **company**, after the events, when the campaign chose either dimension. Same
+tools, different question: not what happened, but where they say they are going and what they run
+on. No recency window; date every row anyway. If only one of the two was chosen, drop the other
+list from the prompt rather than paying for it and discarding it.
 
 ```
 You are gathering background for a personalisation file. Today is {{today}}.
@@ -98,6 +107,57 @@ Return {"company": "", "direction": [...], "stack_and_market": [...], "notes": "
 Write these into the same `signals` array with `type: direction` or `type: stack & market`, and
 give each an `angle` that says what scene 2 should lean on. Keep them one row per fact like
 everything else.
+
+## Relationship context (K)
+
+Two steps, and the first one is not research.
+
+**1. Join what the customer holds.** CRM history, account notes, meeting records, a list of their
+existing customers, and every column of the file they sent. A lead file often already names the
+existing customer in the same business park or region. Each fact becomes a `relationship` row
+with `supplied_by_customer: yes`, `for_person` set to the person when it is about one of them (a
+meeting, a past deal) or `ALL` when it is about the company, and the file and column named in the
+`fact`. This costs no research tasks.
+
+**2. Look for public connections, only against a list.** When the customer supplies their
+existing customers, it is a fair question which prospects work beside one. Without such a list
+there is nothing specific to look for, and a search for "connections" returns noise.
+
+```
+You are checking whether a prospect has a public connection to one of the seller's existing
+customers. Today is {{today}}.
+
+TARGET COMPANY
+  {{company}} · {{domain}} · {{country}} · {{site address, if the file has one}}
+
+THE SELLER'S EXISTING CUSTOMERS (supplied by the seller)
+  {{name · domain · location, one per line}}
+
+WHAT COUNTS, and only these
+  same site        the same business park, industrial zone, campus or building
+  named together   a case study, project page, press release or public tender naming both
+  shared body      both on the same cluster, consortium or association membership list
+
+WHAT DOES NOT COUNT
+  Same industry. Same city. The same trade show. A shared supplier. None of these is a
+  connection the recipient would recognise, and claiming one reads as automated.
+
+THE FOUR GATES still apply: the source STATES it, it is THIS company, it is current, the
+reading is correct.
+
+FOR EACH CONNECTION
+  fact (naming which of the seller's customers), date (YYYY-MM at minimum),
+  date_confidence, source_url, evidence_quote (verbatim)
+
+No connection is the usual answer. Return an empty list and say so.
+
+Return {"company": "", "relationship": [...], "notes": ""}
+```
+
+Write these into `signals` with `type: relationship`. A contact with nothing from either step gets
+the campaign default, usually "Cold prospect, no prior contact", which is a correct and useful
+value. The exception is a white-glove contact, who has usually had human contact already: an
+empty result there is an open item, not "cold".
 
 ## Personalization copy, only if asked
 

@@ -7,6 +7,20 @@ Versioning per [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **Four narrative dimensions, and the campaign chooses.** A LatentCast video personalizes along
+  four dimensions, one canvas cell each: triggering event (J), relationship context (K), strategic
+  intent (L) and stack and market (M). `enrich-contacts` now names all four, asks which ones the
+  campaign wants before it spends anything (all four ticked by default), and records the answer as
+  `research.dimensions` in the outreach profile. Which scenes a campaign uses is marketing's call,
+  not the agent's, because the agent cannot see the video. A dimension left out is not researched
+  and its canvas column is switched OFF; a dimension chosen is owed for every company.
+  Relationship context gets a reserved type, `relationship`, sourced from the customer's own
+  records first (`supplied_by_customer: yes`) and from public connections only against a list of
+  the customer's existing customers. The contract gains a derived `dimension` field in all three
+  copies, the canvas skill says where K comes from and how the switches follow the chosen
+  dimensions, and `check_signal_coverage.py` excludes `relationship` rows from fan-out alongside
+  the other two reserved types. The contract's signal table also lost a `type` row that the
+  previous merge duplicated.
 - **`enrich-contacts` sources direction and stack separately from events.** Two reserved signal
   types, `direction` (stated goals, in the organisation's own words) and `stack & market`
   (platforms, vendors, AI use, who they sell to), gathered in a second research task per company

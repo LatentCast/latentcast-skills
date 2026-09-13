@@ -29,10 +29,10 @@ from collections import defaultdict
 
 ALL = "ALL"
 
-# `direction` and `stack & market` feed the canvas scene cells L and M. They are not
-# triggering events and they are not what makes one recipient's video differ from a
-# colleague's, so counting them toward the fan-out target overstates coverage.
-NON_EVENT_TYPES = {"direction", "stack & market"}
+# `relationship`, `direction` and `stack & market` feed the canvas cells K, L and M. They
+# are not triggering events, and fan-out is a count of the distinct events a firm can
+# spread across its people and touches, so counting them overstates coverage.
+NON_EVENT_TYPES = {"relationship", "direction", "stack & market"}
 
 
 def is_event(signal):

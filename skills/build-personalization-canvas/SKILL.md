@@ -126,6 +126,14 @@ for exactly this: `direction` rows (stated goals, in their own words) feed L, an
 neither, stop and run that pass upstream rather than researching inside the canvas build, where
 it is done in a hurry and never gets a source.
 
+**Relationship Context (K) comes from `relationship` rows** when there are any: a fact that names
+this person, or `ALL`, said in plain words. With none, K takes the campaign default from
+`canvas.look_and_feel`. Never write a relationship the rows do not state.
+
+**The dimensions the campaign chose set the switches.** Any of J, K, L and M missing from
+`research.dimensions` is set `OFF` in row 3 and left blank, because it was never researched. A
+chosen dimension that is blank on a row is a gap to report, not a column to switch off.
+
 **Two fields from upstream change what you write.** `routing` says whether this is a white-glove
 or a cold contact, and the register differs: a white-glove recipient has usually had human
 contact, so `relationship_context` should say so rather than reading "cold prospect". And

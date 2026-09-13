@@ -74,27 +74,42 @@ Capping at three columns loses the fourth. Keep them long and flatten only on ex
 | `recipient_id`, `company` | What it attaches to |
 | `fact` | What happened, one sentence, as the source states it |
 | `date`, `date_confidence` | `YYYY-MM` minimum. `exact` / `month` / `approximate` |
-| `type` | From the profile's signal ladder |
-| `type` | From the profile's signal ladder. Two reserved values, `direction` and `stack & market`, mark durable background rows rather than events; see below |
-| `source_url` | The page that states it. Never a search results page |
+| `type` | From the profile's signal ladder. Three reserved values, `relationship`, `direction` and `stack & market`, mark rows that are not events; see below |
+| `dimension` | Derived from `type`: which canvas column the row can feed. See below |
+| `source_url` | The page that states it. Never a search results page. Blank only on a row the customer supplied |
+| `supplied_by_customer` | `yes` when the fact came from the customer's own records (CRM history, account notes, a column in their file) rather than from a page. The `fact` names where |
 | `for_person` | The person the source actually **names**. `ALL` when the source names only the company |
 | `scope` | Derived: `person-specific` when `for_person` matches the recipient, `company-wide` otherwise |
 | `angle` | **Core output.** One line: how this seller's offer connects to this event. Research, not copy. No booking link, no call to action |
 
-### Direction, and stack and market — two reserved types
+### Four dimensions — one event type and three reserved ones
 
-Events feed the canvas Triggering Event (J). Two more kinds of row feed the other two scene
-cells, and the canvas stage writes those cells from nothing else:
+A LatentCast video personalizes along four dimensions, one canvas column each. Every signal row
+belongs to exactly one, and `dimension` says which:
 
-| `type` | Holds | Feeds canvas |
-|---|---|---|
-| `direction` | Stated goals, growth direction, public commitments, in the organisation's own words | L, Strategic Priorities |
-| `stack & market` | Platforms, hosting model, named vendors, AI use, compliance regime, who they sell to, scale | M, Relevance Signals |
+| `type` | `dimension` | Holds | Feeds canvas |
+|---|---|---|---|
+| any value from the signal ladder | `triggering_event` | A dated event inside the recency window | J, Triggering Event |
+| `relationship` | `relationship_context` | How the seller and the recipient are connected: prior contact, an existing account, a mutual connection, a customer of the seller's who works beside them | K, Relationship Context |
+| `direction` | `strategic_priorities` | Stated goals, growth direction, public commitments, in the organisation's own words | L, Strategic Priorities |
+| `stack & market` | `relevance_signals` | Platforms, hosting model, named vendors, AI use, compliance regime, who they sell to, scale | M, Relevance Signals |
 
-Same columns as an event row, same four gates, same `source_url` rule. The difference is that the
-recency window does not apply: direction is durable, so an older plan that still runs is a
-correct answer, and the `date` column is what tells the reader how old it is. Never use one as
-the triggering event.
+The three reserved types have the same columns as an event row, the same four gates and the same
+`source_url` rule. The difference is that the recency window does not apply: a strategy that still
+runs, a stack still in place and a customer relationship still live are all current however old
+the page, and the `date` column is what tells the reader how old it is. Never use a reserved row
+as the triggering event.
+
+**Which dimensions a campaign uses is the customer's decision**, asked before the research starts
+and recorded in the outreach profile as `research.dimensions`. A dimension left out is not
+researched, and the canvas switches its column OFF. A dimension chosen is owed for every company:
+at least one row, or a note saying nothing is stated publicly plus an open item.
+
+**Relationship rows mostly come from the customer, not the web.** A row from their own records has
+`supplied_by_customer: yes` and no `source_url`. A row found publicly, such as the same business
+park or a case study naming both, carries its page like any other. Never promote a shared
+industry, city or trade show into a relationship. "Cold prospect, no prior contact" is the correct
+answer when nothing turns up.
 
 ### `recipient_id` is who it is for. `for_person` is who the source names
 
@@ -129,10 +144,10 @@ run the second video was scoped after the first was built; two thirds of recipie
 fact and the rest had to re-frame the first one, which is a worse video than it needed to be. The
 number was knowable on day one.
 
-**Fan-out counts event rows only.** `direction` and `stack & market` rows feed the canvas scene
-cells L and M; they are not triggering events and they are not what makes one recipient's video
-different from their colleague's. Counting them toward the fan-out target overstates coverage,
-which is why `check_signal_coverage.py` excludes them.
+**Fan-out counts event rows only.** `relationship`, `direction` and `stack & market` rows feed the
+canvas cells K, L and M. They are not triggering events, and the fan-out target is a count of the
+distinct events a firm can spread across its people and touches. Counting them overstates
+coverage, which is why `check_signal_coverage.py` excludes them.
 
 
 ### Personalization copy — optional

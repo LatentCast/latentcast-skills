@@ -17,7 +17,8 @@ answers.
 |------|-------|---------------|
 | Source companies | `icp.description`, geography, exclusions | anything about the buyer |
 | Find people | `buyer`, plus `seller` for context | booking links, voice rules, who is on camera |
-| Build a canvas | `seller`, `offer`, `voice`, `canvas` | the buyer definition |
+| Enrich contacts | `seller`, `research` including which `dimensions` to research; `sequence` and `voice` only for copy | the buyer definition, who is on camera |
+| Build a canvas | `seller`, `offer`, `voice`, `canvas`, and `research.dimensions` for the row-3 switches | the buyer definition |
 
 Collecting all of it up front is how a tool that should feel like briefing a colleague ends up
 feeling like a form.

@@ -134,9 +134,21 @@ scoring:
     1: "drop"
 
 # ---------------------------------------------------------------------------
-# research — what counts as a signal. Read by find-contacts only.
+# research — what counts as a signal, and which dimensions to research.
+# Read by find-contacts and enrich-contacts. build-personalization-canvas reads
+# `dimensions` to set its row-3 switches.
 # ---------------------------------------------------------------------------
 research:
+  # The four dimensions a LatentCast video personalizes along, one canvas column each.
+  # Which ones this campaign uses is YOUR decision: enrich-contacts asks before it
+  # spends anything, with all four ticked, and offers to save the answer here. Leave one
+  # out and it is not researched, and its canvas column is switched OFF, not left blank.
+  dimensions:
+    - triggering_event       # J. Dated events inside recency_months, ranked below.
+    - relationship_context   # K. How you know them. Mostly from your own records.
+    - strategic_priorities   # L. Where they say they are going. No recency window.
+    - relevance_signals      # M. Stack, vendors, who they sell to. No recency window.
+
   recency_months: 6
 
   # Reorder this. Correct ranking is offer-dependent: a compliance vendor wants a
