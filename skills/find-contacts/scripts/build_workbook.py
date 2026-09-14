@@ -45,8 +45,9 @@ SHEETS = {
     ],
     "Signals": [
         ("recipient_id", 12), ("company", 26), ("fact", 62), ("date", 11),
-        ("date_confidence", 15), ("type", 16), ("for_person", 20), ("scope", 16),
-        ("source_url", 44), ("angle", 62),
+        ("date_confidence", 15), ("type", 16), ("dimension", 20), ("for_person", 20),
+        ("scope", 16), ("source_url", 44), ("supplied_by_customer", 12),
+        ("evidence_quote", 44), ("angle", 62),
     ],
     "Open items": [
         ("item", 44), ("affects", 26), ("status", 18), ("detail", 76),
@@ -81,7 +82,17 @@ def unwritten_fields(parts):
 
 HEADER_BG = "0D1218"
 ROUTING_FILL = {"white-glove": "E8F0E4", "cold-outreach": "F1F4F6", "drop": "F6ECEC"}
-TYPE_FILL = {"direction": "EEF3FA", "stack & market": "F4F1EA"}
+TYPE_FILL = {"relationship": "F1ECF6", "direction": "EEF3FA", "stack & market": "F4F1EA"}
+
+# The contract's derived `dimension`: which canvas cell a signal row can feed. The three
+# reserved types feed K, L and M; every value from the signal ladder is an event and feeds J.
+RESERVED_DIMENSION = {"relationship": "relationship_context",
+                      "direction": "strategic_priorities",
+                      "stack & market": "relevance_signals"}
+
+
+def dimension_of(sig_type):
+    return RESERVED_DIMENSION.get((sig_type or "").strip().lower(), "triggering_event")
 
 
 def clean(v):
@@ -95,17 +106,23 @@ def clean(v):
 def unpack(data):
     """Accept either the four-part shape or a list of per-company records."""
     if isinstance(data, dict) and any(k in data for k in SHEETS_KEYS):
-        return {k: list(data.get(k, [])) for k in SHEETS_KEYS}
-    records = data if isinstance(data, list) else data.get("records", [])
-    out = {k: [] for k in SHEETS_KEYS}
-    for rec in records:
-        company = {k: v for k, v in rec.items() if k not in ("people", "signals", "open_items")}
-        out["companies"].append(company)
-        for person in rec.get("people", []):
-            out["contacts"].append({"company": rec.get("company", ""), **person})
-        for sig in rec.get("signals", []):
-            out["signals"].append({"company": rec.get("company", ""), **sig})
-        out["open_items"].extend(rec.get("open_items", []))
+        out = {k: [dict(r) for r in data.get(k, [])] for k in SHEETS_KEYS}
+    else:
+        records = data if isinstance(data, list) else data.get("records", [])
+        out = {k: [] for k in SHEETS_KEYS}
+        for rec in records:
+            company = {k: v for k, v in rec.items()
+                       if k not in ("people", "signals", "open_items")}
+            out["companies"].append(company)
+            for person in rec.get("people", []):
+                out["contacts"].append({"company": rec.get("company", ""), **person})
+            for sig in rec.get("signals", []):
+                out["signals"].append({"company": rec.get("company", ""), **sig})
+            out["open_items"].extend(rec.get("open_items", []))
+    # derived, never overwritten: a row deliberately filed under another dimension keeps it
+    for sig in out["signals"]:
+        if not sig.get("dimension"):
+            sig["dimension"] = dimension_of(sig.get("type"))
     return out
 
 
@@ -222,14 +239,18 @@ def audit(data, today):
         name = c.get("company")
         if not people_by_company.get(name):
             nobody.append(name)
+        # Events only. Relationship, direction and stack rows are durable on purpose - a
+        # strategy that still runs is current however old the page - so ageing them flags
+        # firms whose background is exactly what it should be.
         ages = [m for m in (months_between(s.get("date"), today)
-                            for s in sig_by_company.get(name, [])) if m is not None]
+                            for s in sig_by_company.get(name, [])
+                            if s.get("dimension") == "triggering_event") if m is not None]
         if ages and min(ages) > window:
-            stale.append(f"{name} (oldest usable signal {min(ages)} months, window {window})")
+            stale.append(f"{name} (newest event {min(ages)} months old, window {window})")
     if nobody:
         notes.append(f"{len(nobody)} companies returned nobody: " + ", ".join(nobody))
     if stale:
-        notes.append(f"{len(stale)} companies have only stale signals: " + "; ".join(stale))
+        notes.append(f"{len(stale)} companies have only stale events: " + "; ".join(stale))
     if fallback:
         notes.append(f"{len(fallback)} people matched the buyer only as a fallback: "
                      + ", ".join(filter(None, fallback))

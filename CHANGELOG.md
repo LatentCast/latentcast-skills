@@ -7,6 +7,12 @@ Versioning per [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **The Signals sheet says which dimension each row feeds.** `build_workbook.py` gains
+  `dimension`, `supplied_by_customer` and `evidence_quote` columns, derives `dimension` from
+  `type` when a row does not carry one (a deliberately filed value is kept), and tints
+  `relationship` rows alongside `direction` and `stack & market`. Its staleness audit now ages
+  events only: strategy, stack and relationship rows are durable on purpose, and on a live run
+  the audit had called five firms stale because their only rows were strategy pages.
 - **Four narrative dimensions, and the campaign chooses.** A LatentCast video personalizes along
   four dimensions, one canvas cell each: triggering event (J), relationship context (K), strategic
   intent (L) and stack and market (M). `enrich-contacts` now names all four, asks which ones the

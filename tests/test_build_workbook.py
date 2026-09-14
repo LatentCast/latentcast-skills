@@ -191,3 +191,52 @@ def test_build_warns_but_proceeds_when_loss_is_allowed(tmp_path, capsys):
     counts = bw.build(data, tmp_path / "out.xlsx", strict_fields=False)
     assert counts["Contacts"] == 1
     assert "surprise" in capsys.readouterr().err
+
+
+# --------------------------------------------------------------- dimensions
+
+def test_signals_sheet_carries_the_dimension_columns():
+    """Which canvas cell a row can feed, and whether the customer supplied it. Without
+    them a reviewer cannot tell a strategy row from an event, or why a relationship row
+    has no link."""
+    declared = {n for n, _ in bw.SHEETS["Signals"]}
+    assert {"dimension", "supplied_by_customer", "evidence_quote"} <= declared
+
+
+@pytest.mark.parametrize("sig_type,expected", [
+    ("project milestone", "triggering_event"),
+    ("", "triggering_event"),
+    ("relationship", "relationship_context"),
+    (" Direction ", "strategic_priorities"),
+    ("STACK & MARKET", "relevance_signals"),
+])
+def test_dimension_is_derived_from_type(sig_type, expected):
+    parts = bw.unpack([{"company": "Ostvale", "people": [],
+                        "signals": [{"fact": "f", "type": sig_type}], "open_items": []}])
+    assert parts["signals"][0]["dimension"] == expected
+
+
+def test_a_supplied_dimension_is_kept():
+    parts = bw.unpack([{"company": "Ostvale", "people": [],
+                        "signals": [{"fact": "f", "type": "milestone",
+                                     "dimension": "relevance_signals"}], "open_items": []}])
+    assert parts["signals"][0]["dimension"] == "relevance_signals"
+
+
+def test_staleness_audit_ages_events_only():
+    """Strategy, stack and relationship rows are durable on purpose. On a live run the
+    audit called five firms stale because their only rows were strategy pages."""
+    data = [{"company": "Ostvale", "people": [{"recipient_id": "R-1", "full_name": "A One"}],
+             "signals": [{"fact": "Net zero by 2030", "type": "direction", "date": "2021-03"},
+                         {"fact": "Own fleet", "type": "stack & market", "date": "2020-01"},
+                         {"fact": "Samples sent", "type": "relationship", "date": "2024"}],
+             "open_items": []}]
+    assert not any("stale" in n for n in bw.audit(data, "2026-09-14"))
+
+
+def test_staleness_audit_still_flags_old_events():
+    data = [{"company": "Ostvale", "people": [{"recipient_id": "R-1", "full_name": "A One"}],
+             "signals": [{"fact": "Opened a depot", "type": "expansion", "date": "2024-01"}],
+             "open_items": []}]
+    notes = bw.audit(data, "2026-09-14")
+    assert any("only stale events" in n and "Ostvale" in n for n in notes)
