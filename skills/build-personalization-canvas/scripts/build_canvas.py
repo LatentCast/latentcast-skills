@@ -250,8 +250,26 @@ def validate(rows, toggles, allow_blank_rep=False, allow_incomplete=False):
             f" (excluding any URL): rows " + ", ".join(str(r) for r, _n in hits[:8])
             + (" ..." if len(hits) > 8 else "")
             + ". One line each - it sits beside the player, and anything that wraps"
-              " competes with the video. Move the detail to Triggering Event or"
-              " Relevance Signals.")
+              " competes with the video. Keep the one specific thing; the rest belongs"
+              " in the signal doc.")
+
+    # Scene cells are spoken, and the proxy says every word. One message per cell, about
+    # twenty words: on a live campaign the triggering event averaged 43 and ran to 97,
+    # which is a thirty-second scene reciting the recipient's own business back to them.
+    scene_cap = 20
+    long_scene = {}
+    for i, row in enumerate(rows):
+        for key in ("triggering_event", "relationship_context", "strategic_priorities",
+                    "relevance_signals"):
+            words = len(str(row.get(key) or "").split())
+            if words > scene_cap:
+                long_scene.setdefault(key, []).append((4 + i, words))
+    for key, hits in long_scene.items():
+        worst = max(n for _r, n in hits)
+        warnings.append(
+            f"{key} runs past {scene_cap} words on {len(hits)} row(s), worst {worst}: rows "
+            + ", ".join(str(r) for r, _n in hits[:8]) + (" ..." if len(hits) > 8 else "")
+            + ". It is spoken: keep one message and leave the rest in the signal doc.")
 
     # An agent emitting ctaMessage instead of cta_message produces a canvas with every
     # narrative cell blank and no error at all. This is the check that catches it.

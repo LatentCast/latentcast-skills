@@ -15,6 +15,18 @@ Versioning per [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **One message per canvas cell, chosen before the platform sees it.** The per-recipient prompt
+  now receives its research grouped by the cell each row can feed (J, K, L, M), picks the single
+  fact that best connects to the offer for each, and writes it in twenty words or fewer; the rest
+  stays in the signal doc. The platform only ever sees the cell, so handed three facts it chooses
+  among them, and chooses badly. `build_canvas.py` warns past twenty words on any spoken cell, as
+  it already did on long viewing-page copy: on a live campaign the triggering event averaged 43
+  words and ran to 97, a thirty-second scene reciting the recipient's business back to them.
+  Relationship Context (K) is now written from `relationship` rows, with the campaign default
+  only when there are none, and the workflow switches OFF every dimension the campaign did not
+  choose and prints the `--toggles` to build with. The worked examples obey their own rules:
+  every sample welcome message is under the 120-character cap, which returns CI's strict example
+  build to green.
 - **The Signals sheet says which dimension each row feeds.** `build_workbook.py` gains
   `dimension`, `supplied_by_customer` and `evidence_quote` columns, derives `dimension` from
   `type` when a row does not carry one (a deliberately filed value is kept), and tints

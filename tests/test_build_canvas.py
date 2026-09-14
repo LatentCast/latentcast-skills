@@ -428,3 +428,32 @@ def test_the_length_warning_names_the_rows():
     warnings = bc.validate(rows, dict(bc.TOGGLES))
     hit = [w for w in warnings if "welcome_message runs long" in w][0]
     assert "rows 5" in hit
+
+
+# --------------------------------------------------------------- scene-cell length
+
+def test_a_long_scene_cell_is_flagged():
+    """Spoken cells averaged 43 words on a live campaign, and ran to 97."""
+    rows = [a_row(triggering_event=" ".join(["word"] * 43))]
+    warnings = bc.validate(rows, dict(bc.TOGGLES))
+    assert any("triggering_event runs past 20 words" in w for w in warnings)
+
+
+def test_a_twenty_word_scene_cell_passes():
+    rows = [a_row(relevance_signals=" ".join(["word"] * 20))]
+    warnings = bc.validate(rows, dict(bc.TOGGLES))
+    assert not any("runs past" in w for w in warnings)
+
+
+def test_every_spoken_cell_is_capped():
+    for key in ("triggering_event", "relationship_context", "strategic_priorities",
+                "relevance_signals"):
+        warnings = bc.validate([a_row(**{key: "x " * 30})], dict(bc.TOGGLES))
+        assert any(f"{key} runs past" in w for w in warnings), key
+
+
+def test_viewing_page_cells_are_not_word_capped():
+    """V and W have their own character limit; the word cap is for spoken cells."""
+    rows = [a_row(welcome_message=" ".join(["ok"] * 25))]
+    warnings = bc.validate(rows, dict(bc.TOGGLES))
+    assert not any("runs past" in w for w in warnings)

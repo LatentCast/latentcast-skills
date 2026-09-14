@@ -210,7 +210,7 @@ def test_sample_data_reaches_installed_users(root_copy, skill_copy):
     assert a == b, f"{skill_copy} has drifted from {root_copy}"
 
 
-CANVAS_KEYS = {"industry", "triggering_event", "strategic_priorities",
+CANVAS_KEYS = {"industry", "triggering_event", "relationship_context", "strategic_priorities",
                "relevance_signals", "welcome_message", "cta_message"}
 
 

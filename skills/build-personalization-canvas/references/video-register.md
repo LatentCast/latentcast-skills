@@ -6,8 +6,9 @@ What to write in the narrative cells. The format itself is in [canvas-v6.md](can
 
 The canvas feeds two different places, and copy that works in one is wrong in the other.
 
-**The scenes.** `triggering_event` (J), `strategic_priorities` (L) and `relevance_signals` (M)
-feed Scene 1 and Scene 2. They shape what the proxy performs on camera. Write them to be heard.
+**The scenes.** `triggering_event` (J), `relationship_context` (K), `strategic_priorities` (L)
+and `relevance_signals` (M) feed Scene 1 and Scene 2. They shape what the proxy performs on
+camera. Write them to be heard.
 
 **The viewing page.** `welcome_message` (V) and `cta_message` (W) are shown beside the video
 player. They are read, not spoken.
@@ -28,9 +29,27 @@ sounds like someone reciting a press release aloud, and a date read out sounds l
 So the same signal produces two different artifacts. Reused email copy is wordy, formal and
 generic on camera. That is the whole reason this step exists.
 
+## One message per cell
+
+**Pick one fact for each scene cell, and write only that.** The research behind a recipient
+usually holds several true things. A cell that strings two or three of them together makes the
+proxy talk about the recipient's own business for thirty or forty-five seconds, and that is the
+worst version of a personalized video: recipients now recognise automated personalization on
+sight, and a list of things you found reads as exactly that.
+
+**The choice is made here, not on the platform.** The canvas stage has the whole research record
+and knows the offer. The platform sees only the cell, so hand it three facts and it chooses
+among them, usually badly. Hand it one and it says one.
+
+**Twenty words or fewer.** The builder warns past twenty on any spoken cell. On one live campaign
+the triggering event averaged 43 words and ran to 97.
+
+Everything left out is not lost. It stays in the signal doc, where the email sequence and the next
+touch can use it.
+
 ## The register, for scene cells
 
-- **One sentence per cell.**
+- **One message, one sentence per cell.**
 - **Present tense, live framing.** "Just opened", "Now running", "Moving into".
 - **A number or a specific if there is one.** Not a number for its own sake.
 - **Date stripped. Source stripped.** They existed so the researcher could verify the signal.
@@ -44,10 +63,10 @@ generic on camera. That is the whole reason this step exists.
 | Cell | Col | Surface | What goes in |
 |------|-----|---------|--------------|
 | `triggering_event` | J | Scene 1 | The strongest signal, reframed as one live sentence. If the signal is weak, say a plainer true thing rather than inflating it. |
-| `relationship_context` | K | Scene 1 | How you know them, in plain words. "Cold prospect, no prior contact" is a perfectly good value. |
+| `relationship_context` | K | Scene 1 | The one connection a relationship row states, in plain words. With none, the campaign default: "Cold prospect, no prior contact" is a perfectly good value. |
 | `strategic_priorities` | L | Scene 2 | Their direction and goals. **Not a second news event.** |
-| `relevance_signals` | M | Scene 2 | Stack, motion, latest product, who they sell to. |
-| `welcome_message` | V | Viewing page | Short, warm, on the page beside the player. Congratulate the event, then offer the help. |
+| `relevance_signals` | M | Scene 2 | The one stack or market fact that matters to your offer. |
+| `welcome_message` | V | Viewing page | One line beside the player, 120 characters at most. Congratulate the event, then the outcome. |
 | `cta_message` | W | Viewing page | The ask. Short enough to read at a glance. |
 
 ## The medium is video. The offer is your product.
@@ -60,11 +79,12 @@ video" is describing the envelope rather than the letter.
 
 > **Welcome template**
 >
-> `{first_name}, congrats on {event}. We'd love to help {company} {specific outcome} with {seller.product_noun}.`
+> `{first_name}, congrats on {event}. We'd love to help {company} {specific outcome}.`
 
-Do not write "with personalized video" unless personalized video is literally what you sell.
-`product_noun` comes from your outreach profile and goes in verbatim, so write it the way you would
-say it out loud: "route optimisation", not "our RouteIQ 3.0 platform".
+Name the product where it fits the line: `with {seller.product_noun}`. Do not write "with
+personalized video" unless personalized video is literally what you sell. `product_noun` comes
+from your outreach profile and goes in verbatim, so write it the way you would say it out loud:
+"route optimisation", not "our RouteIQ 3.0 platform".
 
 > **CTA template**
 >
@@ -143,17 +163,14 @@ relationship_context (K)
   Cold prospect, no prior contact.
 
 strategic_priorities (L)
-  Serving Germany and Denmark from the new site, and moving from single-depot to
-  multi-depot planning.
+  Serving Germany and Denmark from the new site, and moving to multi-depot planning.
 
 relevance_signals (M)
-  Chilled and ambient goods to regional grocery and foodservice. Own fleet, planning
-  done in-house, no dynamic routing in the stack.
+  Own fleet and in-house planners, with no dynamic routing in the stack.
 
 welcome_message (V)
-  Priya, congrats on the Rotterdam site. We'd love to help Ostvale hold cost-per-drop
-  flat once the German routes come online, with route optimisation built for
-  multi-depot networks.
+  Priya, congrats on Rotterdam. We'd love to help Ostvale keep German routes cheap,
+  with route optimisation.
 
 cta_message (W)
   Priya, worth 20 minutes to see this built for Ostvale? cal.example.com/haldenbrook/20min
@@ -166,9 +183,10 @@ cta_message (W)
 - **The source went.** Nobody says a URL out loud.
 - **Present tense.** "Just opened" rather than "announced the opening of".
 - **41 words down to 13** in the triggering event. Everything cut was scaffolding.
-- **The outcome got specific.** Not "improve your route planning" but "hold cost-per-drop flat
-  once the German routes come online". That sentence cannot be pasted into another row, which is
-  the test.
+- **One message in M.** The research also said Ostvale moves chilled and ambient goods to grocery
+  and foodservice. True, and left out: the stack fact is the one route optimisation answers.
+- **The outcome got specific.** Not "improve your route planning" but "keep German routes
+  cheap". That sentence cannot be pasted into another row, which is the test.
 - **The offer names the product, not the medium.** "with route optimisation", not "a short
   personalized video". The video is how it arrives; it is not what is being sold.
 - **The company name shortened.** "Ostvale" is what a person says. "Ostvale Provisions" is what
@@ -184,9 +202,8 @@ triggering_event (J)
   Added a chilled range to the daily delivery run.
 
 welcome_message (V)
-  Tomas, we'd love to help Quernvale keep its morning windows intact now that chilled
-  is on the same run, with route optimisation that replans during the day rather than
-  once a week.
+  Tomas, we'd love to help Quernvale keep its morning windows intact now chilled is on
+  the same run.
 ```
 
 No manufactured congratulation, and the specific still does the work. Compare that with forcing

@@ -174,8 +174,8 @@ page furniture, not the message: the message is the video, and anything that wra
 competes with it.
 
 Keep the recipient's first name and the one specific thing. Everything else you wanted
-to say belongs in `triggering_event`, `relevance_signals` and `relationship_context`,
-which is where the script writer and the email sequence read from anyway.
+to say belongs in the signal doc, where the email sequence reads from anyway. The scene
+cells are not an overflow either: each carries one message, in twenty words or fewer.
 
 > Priya, the Rotterdam depot is where hand-built routes usually stop scaling.
 
