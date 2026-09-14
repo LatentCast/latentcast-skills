@@ -5,6 +5,14 @@ Versioning per [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [0.2.0] — unreleased
 
+### Fixed
+
+- **`validate_sources.py` no longer calls a working homepage truncated.** It flagged any link
+  that was a prefix of another collected link, so a homepage or section cited next to a page
+  beneath it came back as "looks truncated". On one live run that was 39 of 51 errors, and every
+  one of them opened. A link is now truncated only when it stops part-way through a path
+  segment. First tests for the script.
+
 ### Added
 
 - **The Signals sheet says which dimension each row feeds.** `build_workbook.py` gains

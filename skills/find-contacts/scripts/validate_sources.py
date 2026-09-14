@@ -64,8 +64,24 @@ def collect(data):
 
 
 def looks_truncated(url, siblings):
-    """A URL that is a strict prefix of another collected URL was almost certainly clipped."""
-    return any(other != url and other.startswith(url) for other in siblings)
+    """A URL that stops part-way through a path segment another collected URL completes.
+
+    Being a prefix is not enough. A homepage or a section is a legitimate source even when
+    another row cites a page beneath it: `https://x.example/` is a prefix of
+    `https://x.example/about` and is not clipped. On one live run that reading produced
+    39 of 51 errors, every one of them a working homepage. A real clip stops mid-word, so
+    the longer link carries on with more of the same segment.
+
+    A link clipped exactly at a slash is indistinguishable from a section link; it opens,
+    and only reading the page shows it does not state the fact.
+    """
+    for other in siblings:
+        if other == url or not other.startswith(url):
+            continue
+        if url.endswith(("/", "?", "#", "&", "=")) or other[len(url)] in "/?#":
+            continue
+        return True
+    return False
 
 
 def check(url, timeout):
